@@ -1,0 +1,3 @@
+// src/agents/README.md
+// Agentic orchestration components — to be implemented in Day 3
+// Each agent handles one phase of the observe → recover loop

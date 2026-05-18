@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Secrets — NEVER commit
+.env
+.env.local
+.env.production
+.env.*.local
+*.key
+*-credentials.json
+service-account*.json
+firebase-adminsdk*.json
+
+# Expo
+.expo/
+dist/
+build/
+web-build/
+*.apk
+*.ipa
+*.tar.gz
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Cloud Functions
+functions/lib/
+functions/.env
+functions/.env.local
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo

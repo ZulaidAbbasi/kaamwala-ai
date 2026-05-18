@@ -1,0 +1,130 @@
+rules_version = '2';
+
+// =============================================================================
+// KaamWala AI — Firestore Security Rules (MVP)
+// =============================================================================
+// Architecture: All WRITES go through Cloud Functions using Admin SDK.
+//               Admin SDK bypasses these rules entirely.
+//               These rules only govern direct client (mobile app) access.
+//
+// Strategy:
+//   - All client writes: DENIED (backend writes everything)
+//   - All client reads: require authentication
+//   - Owner-scoped reads where possible
+//   - Provider profiles: public read for authenticated users (business info only)
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // DEFAULT: Deny everything not explicitly allowed
+    // =========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
+    // 1. users — Owner can read their own profile
+    // =========================================================================
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // Admin SDK only
+    }
+
+    // =========================================================================
+    // 2. provider_profiles — Any authenticated user can read
+    //    (Business info only, no real PII in demo profiles)
+    // =========================================================================
+    match /provider_profiles/{providerId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Admin SDK only
+    }
+
+    // =========================================================================
+    // 3. service_requests — Owner can read their own requests
+    // =========================================================================
+    match /service_requests/{requestId} {
+      allow read: if request.auth != null
+                  && resource.data.customerUid == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
+    // =========================================================================
+    // 4. provider_candidates — Authenticated users can read
+    //    (MVP: no cross-user data leak risk since backend creates with
+    //     correct workflowId ownership. Production would add owner check.)
+    // =========================================================================
+    match /provider_candidates/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // 5. ranking_decisions — Authenticated users can read
+    // =========================================================================
+    match /ranking_decisions/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // 6. price_estimates — Authenticated users can read
+    // =========================================================================
+    match /price_estimates/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // 7. bookings — Customer or assigned provider can read
+    // =========================================================================
+    match /bookings/{bookingId} {
+      allow read: if request.auth != null
+                  && (resource.data.customerUid == request.auth.uid);
+      // Production: also allow provider's ownerUid to read
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // 8. booking_events — Authenticated users can read
+    // =========================================================================
+    match /booking_events/{eventId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // 9. notifications — Recipient can read
+    // =========================================================================
+    match /notifications/{notifId} {
+      allow read: if request.auth != null
+                  && resource.data.recipientId == request.auth.uid;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // 10. fallback_events — Authenticated users can read
+    // =========================================================================
+    match /fallback_events/{eventId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // 11. agent_traces — Authenticated users can read
+    //     (Traces contain no PII — only system decision logs)
+    // =========================================================================
+    match /agent_traces/{traceId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // 12. app_metrics — No client access
+    // =========================================================================
+    match /app_metrics/{docId} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KaamWala AI - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#e9ddff",
+                        "tertiary": "#39008b",
+                        "surface-variant": "#dce2f7",
+                        "background": "#f9f9ff",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#d0bcff",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#064e3b",
+                        "secondary-container": "#86f2e4",
+                        "surface-container": "#e9edff",
+                        "on-surface": "#141b2b",
+                        "on-primary-fixed": "#002117",
+                        "on-primary-container": "#80bea6",
+                        "on-tertiary-fixed": "#23005c",
+                        "surface-dim": "#d3daef",
+                        "tertiary-container": "#5210bc",
+                        "on-secondary-fixed": "#00201d",
+                        "primary-fixed-dim": "#95d3ba",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#bfc9c3",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#006a61",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "on-surface-variant": "#404944",
+                        "on-primary-fixed-variant": "#0b513d",
+                        "surface-container-highest": "#dce2f7",
+                        "surface": "#f9f9ff",
+                        "surface-container-high": "#e1e8fd",
+                        "surface-bright": "#f9f9ff",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#95d3ba",
+                        "inverse-on-surface": "#edf0ff",
+                        "on-tertiary-fixed-variant": "#5516be",
+                        "on-secondary-fixed-variant": "#005049",
+                        "primary-fixed": "#b0f0d6",
+                        "surface-container-low": "#f1f3ff",
+                        "on-tertiary-container": "#bda3ff",
+                        "primary": "#003527",
+                        "secondary-fixed": "#89f5e7",
+                        "on-background": "#141b2b",
+                        "outline": "#707974",
+                        "on-secondary-container": "#006f66",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#2b6954",
+                        "inverse-surface": "#293040"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "12px",
+                        "section-gap": "24px",
+                        "card-padding": "16px",
+                        "base": "8px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-container-high text-primary dark:text-inverse-primary font-headline-md text-headline-md font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed docked full-width top-0 sticky bg-surface dark:bg-surface-container-high shadow-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex justify-between items-center w-full px-container-margin py-base z-50">
+<button class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-variant/50 transition-colors p-2 rounded-full focus:outline-none">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<span class="truncate px-4">KaamWala AI</span>
+<div class="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close-up portrait of a professional individual with a friendly demeanor. The lighting is soft and natural, creating a welcoming and trustworthy mood. The background is slightly blurred to keep the focus on the subject. The visual style is modern corporate, aligning with a high-trust, reliable brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1mCb7un5tAnPAevTAIcjVJu2FHLOCzhkVw5pVUr1lZF0x0FCCgVtC6Zv3ZFWjGeoVRepvxTGKs9xlY43HL1X5Gso32McwS-zV6ZDQkuD8xalqaJC428qvImoP4n5O93znyOHCvexfK6noHPy6hs80CazxEAYC0tEjDakbfDFFev8qyRy0uudjwXXcLsfyvik9e8-wZNHMfD3QmKWsXr5jc7c-6sUzJnpPSVzh2HBPPjlcvWfEnOp6owI-Q9ARBBdz0BSIIWxD160"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col px-container-margin py-section-gap gap-section-gap pb-32">
+<!-- Hero Section -->
+<section class="flex flex-col gap-gutter">
+<div class="text-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">KaamWala AI</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Agentic Service Orchestrator for Pakistan’s Informal Economy</p>
+</div>
+<div class="w-full h-48 rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.05)] relative mb-4">
+<img alt="Abstract service network visual" class="w-full h-full object-cover" data-alt="A modern, abstract illustration depicting a connected service network. It features subtle, interconnected nodes and glowing pathways in tones of deep emerald and soft purple against a clean white and light gray background. The style is sleek, corporate, and technological, conveying a sense of empowered reliability and agentic orchestration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVvrlLt0oZi9A2gN4g745SJkfaeuBYRQnCFxv9AgPpwL1sxFBPOBkVLz2FqIdyS5F8NGkUfpHJhjkRrWUa9qJQfs1KcxDKl9VV-A7YDKibDZzNRM_3woAYr78sJ7egAhsG3D6QU8QVrq8am6eyNsSFRbWpdDA8Bq30j_dMLtOgt18pre-B3JNu56yqLr-4NQdw1SeLcLYANVCuPo-MqjxXFER9oPwNdE4A5_LUeqLVHcbHo1d_i2GgV5j9oqA65smhR7fQn2hjAPA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+</div>
+<!-- Status Badges Grid -->
+<div class="grid grid-cols-2 gap-base">
+<div class="flex items-center gap-2 bg-primary/10 rounded-lg p-2 border-l-4 border-primary">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-sm text-label-sm text-primary">Backend Live</span>
+</div>
+<div class="flex items-center gap-2 bg-[#F59E0B]/10 rounded-lg p-2 border-l-4 border-[#F59E0B]">
+<span class="material-symbols-outlined text-[#F59E0B] text-sm" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+<span class="font-label-sm text-label-sm text-[#D97706]">Firebase Connected</span>
+</div>
+<div class="flex items-center gap-2 bg-[#8B5CF6]/10 rounded-lg p-2 border-l-4 border-[#8B5CF6]">
+<span class="material-symbols-outlined text-[#8B5CF6] text-sm" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-sm text-label-sm text-[#7C3AED]">Gemini Ready</span>
+</div>
+<div class="flex items-center gap-2 bg-[#0D9488]/10 rounded-lg p-2 border-l-4 border-[#0D9488]">
+<span class="material-symbols-outlined text-[#0D9488] text-sm" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="font-label-sm text-label-sm text-[#0F766E]">Places Ready</span>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="flex flex-col gap-base">
+<button class="w-full bg-[#064E3B] text-on-primary font-headline-md text-headline-md py-4 rounded-xl shadow-[0px_12px_32px_rgba(0,0,0,0.1)] flex justify-center items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                Run Full Agentic Workflow
+            </button>
+<button class="w-full border-2 border-[#064E3B] text-[#064E3B] bg-transparent font-headline-md text-headline-md py-3 rounded-xl flex justify-center items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">step_into</span>
+                Step-by-Step Demo
+            </button>
+</section>
+<!-- Workflow Stepper Preview -->
+<section class="bg-surface-container-low rounded-xl p-card-padding shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant flex flex-col gap-gutter overflow-hidden">
+<h2 class="font-headline-md text-headline-md text-on-surface">Workflow Preview</h2>
+<div class="flex items-center overflow-x-auto pb-4 hide-scrollbar snap-x">
+<!-- Steps -->
+<div class="flex items-center shrink-0 snap-start">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-[#064E3B] flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">Understand</span>
+</div>
+<div class="w-8 h-0.5 bg-[#064E3B] -mt-5 mx-1"></div>
+</div>
+<div class="flex items-center shrink-0 snap-start">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">search</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Discover</span>
+</div>
+<div class="w-8 h-0.5 border-t-2 border-dashed border-outline-variant -mt-5 mx-1"></div>
+</div>
+<div class="flex items-center shrink-0 snap-start">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">sort</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Rank</span>
+</div>
+<div class="w-8 h-0.5 border-t-2 border-dashed border-outline-variant -mt-5 mx-1"></div>
+</div>
+<div class="flex items-center shrink-0 snap-start">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">payments</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Price</span>
+</div>
+<div class="w-8 h-0.5 border-t-2 border-dashed border-outline-variant -mt-5 mx-1"></div>
+</div>
+<div class="flex items-center shrink-0 snap-start">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">book_online</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Book</span>
+</div>
+<div class="w-8 h-0.5 border-t-2 border-dashed border-outline-variant -mt-5 mx-1"></div>
+</div>
+<div class="flex items-center shrink-0 snap-start">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">healing</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Recover</span>
+</div>
+<div class="w-8 h-0.5 border-t-2 border-dashed border-outline-variant -mt-5 mx-1"></div>
+</div>
+<div class="flex items-center shrink-0 snap-start">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">fact_check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Evaluate</span>
+</div>
+</div>
+</div>
+<div class="mt-2 text-center border-t border-outline-variant/30 pt-3">
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                    Real provider discovery. Safe booking records. Transparent AI traces.
+                </p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface/80 backdrop-blur-md dark:bg-inverse-surface/90 text-primary dark:text-primary-fixed-dim font-label-sm text-label-sm font-headline-md text-headline-md font-extrabold text-primary docked full-width bottom-0 rounded-t-xl border-t border-outline-variant/30 dark:border-outline/20 shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 md:hidden">
+<!-- Active Tab: Home -->
+<a class="flex flex-col items-center justify-center bg-tertiary-fixed dark:bg-tertiary-container text-on-tertiary-fixed-variant dark:text-on-tertiary-container rounded-full px-4 py-1 Active: scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<!-- Inactive Tab: Trace -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">analytics</span>
+<span class="font-label-sm text-label-sm mt-1">Trace</span>
+</a>
+<!-- Inactive Tab: Timeline -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">timeline</span>
+<span class="font-label-sm text-label-sm mt-1">Timeline</span>
+</a>
+<!-- Inactive Tab: History -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">receipt_long</span>
+<span class="font-label-sm text-label-sm mt-1">History</span>
+</a>
+</nav>
+<style>
+        /* Utility to hide scrollbar but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Safe area padding for bottom nav on mobile */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .pb-safe {
+                padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</body></html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KaamWala AI - Processing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline-variant": "#bfc9c3",
+                      "on-surface": "#141b2b",
+                      "surface-container-low": "#f1f3ff",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#0b513d",
+                      "background": "#f9f9ff",
+                      "primary": "#003527",
+                      "on-primary-fixed": "#002117",
+                      "error-container": "#ffdad6",
+                      "secondary": "#006a61",
+                      "primary-container": "#064e3b",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-container": "#006f66",
+                      "secondary-fixed-dim": "#6bd8cb",
+                      "primary-fixed": "#b0f0d6",
+                      "inverse-surface": "#293040",
+                      "inverse-primary": "#95d3ba",
+                      "on-tertiary-container": "#bda3ff",
+                      "on-tertiary-fixed": "#23005c",
+                      "primary-fixed-dim": "#95d3ba",
+                      "on-tertiary-fixed-variant": "#5516be",
+                      "surface-bright": "#f9f9ff",
+                      "inverse-on-surface": "#edf0ff",
+                      "surface-container-highest": "#dce2f7",
+                      "surface-container-lowest": "#ffffff",
+                      "error": "#ba1a1a",
+                      "surface-dim": "#d3daef",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed-dim": "#d0bcff",
+                      "surface-variant": "#dce2f7",
+                      "surface-container-high": "#e1e8fd",
+                      "surface": "#f9f9ff",
+                      "on-background": "#141b2b",
+                      "tertiary-container": "#5210bc",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed-variant": "#005049",
+                      "secondary-container": "#86f2e4",
+                      "secondary-fixed": "#89f5e7",
+                      "on-primary": "#ffffff",
+                      "on-primary-container": "#80bea6",
+                      "surface-tint": "#2b6954",
+                      "surface-container": "#e9edff",
+                      "tertiary": "#39008b",
+                      "outline": "#707974",
+                      "tertiary-fixed": "#e9ddff",
+                      "on-surface-variant": "#404944",
+                      "on-secondary-fixed": "#00201d",
+                      "ai-accent": "#8B5CF6",
+                      "ai-accent-bg": "#F5F3FF"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-margin": "20px",
+                      "base": "8px",
+                      "section-gap": "24px",
+                      "gutter": "12px",
+                      "card-padding": "16px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "38px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            },
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col md:hidden pb-[100px]">
+<!-- TopAppBar (Transactional - Hidden Nav, Keep Canvas Focus) -->
+<header class="flex justify-between items-center w-full px-container-margin py-base z-50 bg-surface shadow-sm docked full-width top-0 sticky">
+<div class="flex items-center gap-2">
+<!-- No back button, transactional lock -->
+<span class="font-headline-md text-headline-md font-bold text-primary">Agent Processing</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">person</span>
+</div>
+</header>
+<main class="flex-grow px-container-margin py-section-gap flex flex-col gap-section-gap">
+<!-- Header Section -->
+<div class="flex flex-col items-center justify-center text-center mt-8">
+<div class="w-16 h-16 rounded-full bg-ai-accent-bg flex items-center justify-center mb-4 shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-ai-accent/20">
+<span class="material-symbols-outlined text-ai-accent text-3xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Orchestrating Request</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Agent KaamWala is preparing your tailored solutions.</p>
+</div>
+<!-- Processing Cards Stack -->
+<div class="flex flex-col gap-gutter mt-4">
+<!-- Step 1: Completed -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container-highest flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center flex-shrink-0 mt-1">
+<span class="material-symbols-outlined text-on-primary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline-md text-body-md font-bold text-on-surface">Understanding request...</h3>
+<p class="font-body-md text-label-sm text-on-surface-variant mt-1">Analyzing parameters and intent.</p>
+</div>
+</div>
+<!-- Step 2: Completed -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container-highest flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center flex-shrink-0 mt-1">
+<span class="material-symbols-outlined text-on-primary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline-md text-body-md font-bold text-on-surface">Searching providers...</h3>
+<p class="font-body-md text-label-sm text-on-surface-variant mt-1">Scanning trusted local networks.</p>
+</div>
+</div>
+<!-- Step 3: Active (AI Trace Focus) -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0px_12px_32px_rgba(0,0,0,0.1)] border-l-4 border-ai-accent flex items-start gap-4 relative overflow-hidden">
+<!-- Subtle background shimmer effect (using gradient) -->
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-ai-accent-bg to-transparent opacity-50"></div>
+<div class="w-8 h-8 rounded-full border-2 border-ai-accent flex items-center justify-center flex-shrink-0 mt-1 relative z-10 bg-surface">
+<div class="w-3 h-3 bg-ai-accent rounded-full"></div>
+</div>
+<div class="flex-grow relative z-10">
+<h3 class="font-headline-md text-body-md font-bold text-on-surface">Ranking candidates</h3>
+<p class="font-body-md text-label-sm text-on-surface-variant mt-1 mb-3">Applying matching algorithms based on past success rates.</p>
+<!-- Progress Bar -->
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-ai-accent w-[94%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="font-label-sm text-label-sm text-ai-accent">94% Confidence</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Optimizing...</span>
+</div>
+</div>
+</div>
+<!-- Step 4: Upcoming -->
+<div class="bg-surface/50 rounded-xl p-card-padding border border-dashed border-outline-variant flex items-start gap-4 opacity-60">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center flex-shrink-0 mt-1">
+<span class="font-label-sm text-label-sm text-outline-variant">4</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline-md text-body-md font-bold text-on-surface">Finalizing Selection</h3>
+<p class="font-body-md text-label-sm text-on-surface-variant mt-1">Preparing final recommendations.</p>
+</div>
+</div>
+</div>
+<!-- Badges Area -->
+<div class="mt-auto flex flex-col gap-2 pt-8">
+<div class="bg-primary/5 border-l-4 border-primary rounded-lg p-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-xl">shield_locked</span>
+<div>
+<span class="font-label-sm text-label-sm text-primary block">Safe Simulation</span>
+<span class="font-body-md text-label-sm text-on-surface-variant">Data encrypted locally.</span>
+</div>
+</div>
+<div class="bg-surface-container rounded-lg p-3 flex items-center justify-between border border-surface-container-highest">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">receipt_long</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Agent Trace Logged</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">open_in_new</span>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Suppressed due to Transactional State -->
+</body></html>
