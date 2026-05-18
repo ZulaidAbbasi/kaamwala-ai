@@ -154,7 +154,12 @@ export default function PitchHomeScreen({ navigation }: { navigation: any }) {
           <View style={s.pipelineCard}>
             <Text style={s.sectionTitle}>Agentic Pipeline</Text>
             <Text style={s.sectionSubtitle}>8-stage autonomous workflow</Text>
-            <View style={s.pipelineRow}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              contentContainerStyle={s.pipelineContent}
+              style={s.pipelineScroll}
+            >
               {WORKFLOW_STEPS.map((step, i) => (
                 <View key={i} style={s.pipelineItem}>
                   <View style={[s.pipelineCircle, { borderColor: step.color, shadowColor: step.color }]}>
@@ -173,7 +178,7 @@ export default function PitchHomeScreen({ navigation }: { navigation: any }) {
                   )}
                 </View>
               ))}
-            </View>
+            </ScrollView>
           </View>
 
           {/* ──── Quick Actions ──── */}
@@ -249,12 +254,13 @@ const s = StyleSheet.create({
   pipelineCard: { backgroundColor: C.surface, borderRadius: 20, padding: 20, marginTop: 28, borderWidth: 1, borderColor: C.border },
   sectionTitle: { fontSize: 18, fontWeight: '800', color: C.text, letterSpacing: -0.3 },
   sectionSubtitle: { fontSize: 13, color: C.muted, marginTop: 2, marginBottom: 16 },
-  pipelineRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-evenly', flexWrap: 'nowrap' },
-  pipelineItem: { alignItems: 'center', position: 'relative', width: 42 },
+  pipelineScroll: { marginHorizontal: -20 },
+  pipelineContent: { paddingHorizontal: 20, flexDirection: 'row', alignItems: 'flex-start', gap: 20 },
+  pipelineItem: { alignItems: 'center', position: 'relative', width: 46 },
   pipelineCircle: { width: 36, height: 36, borderRadius: 18, borderWidth: 2, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.04)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 6 },
   pipelineIcon: { fontSize: 15 },
-  pipelineLabel: { fontSize: 8, fontWeight: '600', color: C.muted, marginTop: 4, textAlign: 'center', width: 46 },
-  pipelineConnector: { position: 'absolute', top: 17, left: '75%', right: '-75%', height: 2, zIndex: -1 },
+  pipelineLabel: { fontSize: 8, fontWeight: '600', color: C.muted, marginTop: 4, textAlign: 'center', width: 50 },
+  pipelineConnector: { position: 'absolute', top: 17, left: 23, width: 66, height: 2, zIndex: -1 },
   pipelineConnectorGrad: { flex: 1, height: 2, borderRadius: 1, opacity: 0.5 },
 
   // Quick actions
