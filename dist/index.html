@@ -7,89 +7,31 @@
     <title>KaamWala AI</title>
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
     <style id="expo-reset">
-      /* Reset for wrapper */
-      html { height: 100%; width: 100%; }
+      /* These styles make the body full-height */
+      html,
       body {
         height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        background: linear-gradient(135deg, #0B0F1A 0%, #0d1f2d 50%, #0a1e1a 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
         overflow: hidden;
       }
-      .bg-text {
-        position: absolute;
-        top: 40px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: rgba(16, 185, 129, 0.4);
-        font-size: 24px;
-        font-weight: 800;
-        letter-spacing: 2px;
-        z-index: 0;
-        pointer-events: none;
-      }
-      #device-wrapper {
-        width: 100%;
-        max-width: 414px;
-        height: 90vh;
-        max-height: 896px;
-        background: #000;
-        border-radius: 40px;
-        box-shadow: 0 0 50px rgba(16, 185, 129, 0.15), 0 0 0 10px rgba(255, 255, 255, 0.05), inset 0 0 0 2px rgba(255, 255, 255, 0.1);
-        overflow: hidden;
-        position: relative;
-        z-index: 10;
-        display: flex;
-        flex-direction: column;
-      }
-      .notch {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 140px;
-        height: 30px;
-        background: #000;
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-        z-index: 9999;
-        pointer-events: none;
-      }
+      /* These styles make the root element full-height */
       #root {
         display: flex;
-        flex: 1;
         height: 100%;
-        width: 100%;
-        background: #0B0F1A;
-      }
-      @media (max-width: 480px) {
-        body { background: #0B0F1A; display: block; }
-        .bg-text, .notch { display: none; }
-        #device-wrapper {
-          max-width: none;
-          height: 100%;
-          max-height: none;
-          border-radius: 0;
-          box-shadow: none;
-          margin: 0;
-        }
+        flex: 1;
       }
     </style>
   <link rel="icon" href="./favicon.ico" /></head>
 
   <body>
-    <div class="bg-text">KaamWala AI ✨</div>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="device-wrapper">
-      <div class="notch"></div>
-      <!-- The root element for your Expo app. -->
-      <div id="root"></div>
-    </div>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
   <script src="./_expo/static/js/web/index-345b8455159322c8b983a33077110bba.js" defer></script>
 </body>
 </html>
