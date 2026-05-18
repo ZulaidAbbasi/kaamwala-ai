@@ -8,6 +8,8 @@
 
 **Team Panthers** · Built with Google Antigravity · Powered by Firebase + Gemini
 
+🚀 **[Live Web App Demo](https://kaamwala-ai.psychemetric.org/)** (100% feature parity with Mobile App)
+
 </div>
 
 ---
@@ -255,7 +257,7 @@ KaamWala AI is **NOT** a provider listing app. It is an **agentic service orches
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                     MOBILE APP (Expo + TypeScript)                │
+│               MOBILE & WEB APP (Expo + React Native Web)          │
 │                                                                     │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐  │
 │  │ 23 React     │  │ Firebase     │  │ API Client (HTTPS)       │  │
@@ -919,7 +921,7 @@ kaamwala-ai/
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| **Mobile** | React Native (Expo SDK 53) + TypeScript | 23-screen mobile app |
+| **Mobile & Web** | React Native (Expo SDK 53) + TypeScript | 23-screen app + Web Build |
 | **Backend** | Firebase Cloud Functions (Node.js 22) + Express | 14 secure API endpoints |
 | **Database** | Cloud Firestore | 15 collections, real-time data |
 | **Auth** | Firebase Anonymous Auth | Zero-friction demo auth |
