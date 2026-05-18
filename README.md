@@ -845,74 +845,115 @@ Serving **1,000 requests/month** costs approximately **$41** — viable for a st
 
 ```
 kaamwala-ai/
-├── App.tsx                              # Navigation + auth entry
-├── src/
-│   ├── screens/                         # 23 React Native screens
-│   │   ├── HomeScreen.tsx               # Quick actions hub
-│   │   ├── PitchHomeScreen.tsx          # Product landing
-│   │   ├── WinningDemoScreen.tsx        # Judge demo (one-tap)
-│   │   ├── ServiceRequestScreen.tsx     # Free-text input
-│   │   ├── LiveWorkflowScreen.tsx       # 8-step live stepper
-│   │   ├── WorkflowResultScreen.tsx     # 9-section results
-│   │   ├── ProviderAdminScreen.tsx      # Booking lifecycle
-│   │   ├── FallbackRecoveryScreen.tsx   # 6 recovery scenarios
-│   │   ├── AgentTraceScreen.tsx         # Decision audit trail
-│   │   └── ... (14 more screens)
+├── App.tsx                                      # Navigation + Authentication entry point
+├── app.json                                     # Expo configuration (Mobile + Web targets)
+├── index.html                                   # Web app fallback (redirects to Web Build)
+├── .htaccess                                    # Hostinger Web deployment transparent redirect
+├── .env / .env.example                          # Environment variables for keys
+├── dist/                                        # Exported React Native Web App (100% parity)
+├── src/                                         # FRONTEND (React Native / Expo)
+│   ├── screens/                                 # 23 Cross-Platform Screens
+│   │   ├── AgentTraceScreen.tsx                 # Detailed decision audit trail visualization
+│   │   ├── AIUnderstandingScreen.tsx            # NLU parsed intent + language detection UI
+│   │   ├── AntigravityEvidenceScreen.tsx        # Proof of Antigravity AI usage
+│   │   ├── ApiSetupStatusScreen.tsx             # System architecture & health check
+│   │   ├── BaselineComparisonScreen.tsx         # Before vs After AI agent comparison
+│   │   ├── BookingScreen.tsx                    # Booking creation + eligibility checks
+│   │   ├── DynamicPricingScreen.tsx             # PKR price range estimation + breakdown
+│   │   ├── FallbackRecoveryScreen.tsx           # 6 autonomous failure recovery scenarios
+│   │   ├── FinalSubmissionChecklistScreen.tsx   # Pre-submission 14-point verification
+│   │   ├── FollowUpTimelineScreen.tsx           # 10-step service lifecycle viz
+│   │   ├── HomeScreen.tsx                       # Main dashboard & quick actions
+│   │   ├── LiveWorkflowScreen.tsx               # 8-step live agentic pipeline stepper
+│   │   ├── OutcomeEvaluationScreen.tsx          # 12-metric workflow performance scoring
+│   │   ├── PitchHomeScreen.tsx                  # One-page interactive product landing
+│   │   ├── ProviderAdminScreen.tsx              # Booking lifecycle management (Accept/Reject)
+│   │   ├── ProviderDiscoveryScreen.tsx          # Google Places vs Registered Provider results
+│   │   ├── ProviderOnboardingScreen.tsx         # Provider registration + Firestore saving
+│   │   ├── ProviderRankingScreen.tsx            # 12-factor deterministic scoring breakdown
+│   │   ├── RegisteredProvidersScreen.tsx        # Firestore database provider view
+│   │   ├── ServiceRequestEntryScreen.tsx        # Editable NLU request with location
+│   │   ├── ServiceRequestScreen.tsx             # Free-text Roman Urdu/English input
+│   │   ├── WinningDemoScreen.tsx                # One-tap full workflow execution for judges
+│   │   └── WorkflowResultScreen.tsx             # Comprehensive 9-section workflow report
 │   ├── components/
-│   │   ├── ui/                          # 14 reusable UI components
-│   │   ├── AgentTracePanel.tsx
-│   │   └── ErrorBoundary.tsx
+│   │   ├── AgentTracePanel.tsx                  # Reusable timeline trace visualizer
+│   │   ├── ErrorBoundary.tsx                    # Crash protection
+│   │   └── ui/                                  # 14 Reusable Premium Design Components
+│   │       ├── ActionButton.tsx, EmptyState.tsx, LoadingState.tsx, MetricBar.tsx, 
+│   │       ├── ProgressStepper.tsx, ScoreBar.tsx, ScreenWrapper.tsx, SectionCard.tsx, 
+│   │       ├── StatusBadge.tsx, TimelineStep.tsx, TraceCard.tsx, WarningBox.tsx
+│   │       └── theme.ts                         # Core Design System (Dark mode tokens)
 │   ├── services/
-│   │   ├── backend/apiClient.ts         # API client
-│   │   ├── auth/authService.ts          # Firebase auth
-│   │   └── workflow/                    # Client-side workflow runner
-│   └── config/
-│       ├── api.ts                       # API base URL + endpoints
-│       └── firebase.ts                  # Firebase client config
-├── functions/                           # Firebase Cloud Functions backend
-│   └── src/
-│       ├── index.ts                     # Express app entry (14 routes)
-│       ├── agents/
-│       │   ├── serviceOrchestrator.ts   # 8-step pipeline orchestrator
-│       │   └── outcomeEvaluatorAgent.ts # 12-metric evaluation
-│       ├── endpoints/                   # 14 API endpoint handlers
-│       │   ├── parseRequest.ts
-│       │   ├── discoverProviders.ts
-│       │   ├── rankProviders.ts
-│       │   ├── estimatePrice.ts
-│       │   ├── createBooking.ts
-│       │   ├── simulateFollowUp.ts
-│       │   ├── fallbackRecovery.ts
-│       │   ├── runWorkflow.ts
-│       │   └── ... (6 more endpoints)
-│       ├── services/
-│       │   ├── gemini/
-│       │   │   ├── geminiClient.ts      # 6-model cascade AI client
-│       │   │   ├── geminiFallback.ts    # Deterministic fallback parser
-│       │   │   ├── geminiPrompts.ts     # NLU system instructions
-│       │   │   └── geminiSchemas.ts     # Response validation schemas
-│       │   ├── maps/
-│       │   │   ├── placesService.ts     # Google Places discovery
-│       │   │   ├── geocodingService.ts  # Location → coordinates
-│       │   │   ├── distanceService.ts   # Travel distance/time
-│       │   │   └── mapsClient.ts        # Shared HTTP client
-│       │   ├── rankingService.ts        # 12-factor scoring engine
-│       │   ├── pricingService.ts        # Market-rate estimation
-│       │   ├── serviceTaxonomy.ts       # 14-category taxonomy
-│       │   ├── bookingService.ts        # Booking creation + state
-│       │   ├── traceLogger.ts           # Agent trace logging
-│       │   └── fallbackService.ts       # Recovery logic
-│       ├── types/                       # TypeScript type definitions
-│       └── utils/
-│           └── safeLogger.ts            # Secret-redacting logger
-└── docs/                                # 52 documentation files
-    ├── ARCHITECTURE.md
-    ├── CHALLENGE_2_ALIGNMENT_REPORT.md
-    ├── ANTIGRAVITY_CHALLENGE_2_EVIDENCE.md
-    ├── JUDGE_REVIEW.md
-    ├── API_SETUP_GUIDE.md
-    ├── SECURITY_AND_PRIVACY.md
-    └── antigravity-evidence/            # 12 evidence files
+│   │   ├── auth/authService.ts                  # Firebase Anonymous Auth
+│   │   ├── backend/apiClient.ts                 # Secure HTTPS fetch client (No keys here)
+│   │   ├── backend/orchestratorClient.ts        # Typed client for agent workflow
+│   │   ├── firebase/firestoreService.ts         # Client-side DB reading
+│   │   └── workflow/runServiceWorkflow.ts       # Orchestrates the UI stepping for the pipeline
+│   ├── store/
+│   │   └── traceStore.ts                        # Global state for workflow persistence
+│   ├── config/
+│   │   ├── api.ts                               # Cloud Functions base URL routing
+│   │   ├── constants.ts                         # App-wide UI constants
+│   │   └── firebase.ts                          # Firebase client initialization
+│   └── types/
+│       └── index.ts, agentTrace.ts              # Global TypeScript interfaces
+├── functions/                                   # BACKEND (Firebase Cloud Functions)
+│   ├── src/
+│   │   ├── index.ts                             # Express App Entry (Registers 14 endpoints)
+│   │   ├── agents/
+│   │   │   ├── serviceOrchestrator.ts           # MASTER 8-STEP AGENTIC PIPELINE
+│   │   │   └── outcomeEvaluatorAgent.ts         # Grades workflow performance
+│   │   ├── endpoints/                           # API Routes (Server-Side Execution)
+│   │   │   ├── parseRequest.ts                  # Gemini NLU multilingual parsing
+│   │   │   ├── discoverProviders.ts             # Google Places + Geocoding discovery
+│   │   │   ├── rankProviders.ts                 # 12-factor deterministic scoring
+│   │   │   ├── estimatePrice.ts                 # Market-rate dynamic pricing
+│   │   │   ├── createBooking.ts                 # Firestore booking creation
+│   │   │   ├── simulateFollowUp.ts              # 10-step lifecycle scheduling
+│   │   │   ├── fallbackRecovery.ts              # 6 autonomous failure tests
+│   │   │   ├── runWorkflow.ts                   # E2E single-call pipeline
+│   │   │   ├── evaluateOutcome.ts               # Analytics evaluation
+│   │   │   ├── diagnostics.ts                   # Backend health validation
+│   │   │   ├── providers.ts                     # CRUD for registered providers
+│   │   │   └── bookingActions.ts                # Accept/Reject state mutations
+│   │   ├── services/                            # Core Business Logic & External APIs
+│   │   │   ├── gemini/                          # Google Gemini Integration
+│   │   │   │   ├── geminiClient.ts              # 6-Model Auto-Switching Cascade
+│   │   │   │   ├── geminiFallback.ts            # Zero-dependency deterministic fallback
+│   │   │   │   ├── geminiPrompts.ts             # Orchestrator system prompts
+│   │   │   │   └── geminiSchemas.ts             # Strict JSON output validation
+│   │   │   ├── maps/                            # Google Maps Integration
+│   │   │   │   ├── placesService.ts             # Nearby business discovery
+│   │   │   │   ├── geocodingService.ts          # Text to Coordinates
+│   │   │   │   ├── distanceService.ts           # Travel time matrices
+│   │   │   │   └── mapsClient.ts                # Rate-limited HTTP client
+│   │   │   ├── notifications/                   # Simulated Communications
+│   │   │   │   └── notificationService.ts       # Bilingual preview messages
+│   │   │   ├── rankingService.ts                # The 12-factor scoring engine
+│   │   │   ├── pricingService.ts                # Complexity + Urgency price multiplier
+│   │   │   ├── serviceTaxonomy.ts               # 14-category service matching
+│   │   │   ├── bookingService.ts                # Booking DB abstraction
+│   │   │   ├── fallbackService.ts               # Auto-recovery business logic
+│   │   │   ├── followUpService.ts               # Lifecycle state machine
+│   │   │   └── traceLogger.ts                   # Agent accountability logger
+│   │   ├── config/
+│   │   │   ├── env.ts                           # Server environment secrets
+│   │   │   └── firebaseAdmin.ts                 # Server-side Firebase SDK
+│   │   ├── types/
+│   │   │   └── maps.ts, provider.ts, agentTrace.ts # Backend typings
+│   │   └── utils/
+│   │       ├── safeLogger.ts                    # Secret-redacting console logger
+│   │       ├── testGemini.ts                    # Diagnostic module
+│   │       └── testMaps.ts                      # Diagnostic module
+└── docs/                                        # 52 DOCUMENTATION FILES
+    ├── ARCHITECTURE.md                          # Full system design
+    ├── CHALLENGE_2_ALIGNMENT_REPORT.md          # 7/7 requirements mapping
+    ├── ANTIGRAVITY_CHALLENGE_2_EVIDENCE.md      # Proof of IDE usage
+    ├── JUDGE_REVIEW.md                          # E2E testing guide
+    ├── API_SETUP_GUIDE.md                       # Keys & infrastructure
+    ├── SECURITY_AND_PRIVACY.md                  # Trust boundaries
+    └── antigravity-evidence/                    # 12 raw exported transcripts
 ```
 
 ---
