@@ -33,7 +33,7 @@ export interface WorkflowResult {
   error?: string;
 }
 
-const TIMEOUT_MS = 15000;
+const TIMEOUT_MS = 30000;
 
 async function post(endpoint: string, body: any): Promise<any> {
   const ctrl = new AbortController();
@@ -83,10 +83,24 @@ export async function runServiceWorkflow(
     onStep('parse', 'running', 'Understanding request...');
     const p = await post(API_ENDPOINTS.PARSE_REQUEST, { rawText });
     if (p.traces) traces.push(...p.traces);
-    if (!p.success) { onStep('parse', 'failed', 'Parse failed'); throw new Error('Parse failed'); }
-    result.parsed = p.parsedRequest;
-    result.workflowId = p.workflowId;
-    onStep('parse', 'done', clean(p.parsedRequest?.serviceType, 'Intent extracted'));
+    if (!p.success && p.parsedRequest?.confidenceScore === 0) {
+      // All AI models busy — retry once after a short delay
+      onStep('parse', 'running', 'AI busy, retrying...');
+      await new Promise(r => setTimeout(r, 2000));
+      const p2 = await post(API_ENDPOINTS.PARSE_REQUEST, { rawText });
+      if (p2.traces) traces.push(...p2.traces);
+      if (p2.success || (p2.parsedRequest?.confidenceScore ?? 0) > 0) {
+        result.parsed = p2.parsedRequest;
+        result.workflowId = p2.workflowId;
+      } else {
+        result.parsed = p.parsedRequest;
+        result.workflowId = p.workflowId;
+      }
+    } else {
+      result.parsed = p.parsedRequest;
+      result.workflowId = p.workflowId;
+    }
+    onStep('parse', result.parsed?.confidenceScore > 0 ? 'done' : 'warning', clean(result.parsed?.serviceType, 'Intent extracted'));
 
     // 2. Discover — pass coordinates if GPS available
     onStep('discover', 'running', 'Searching providers...');
@@ -111,11 +125,22 @@ export async function runServiceWorkflow(
       discoverBody.locationSource = 'manual';
     }
 
-    const disc = await post(API_ENDPOINTS.DISCOVER_PROVIDERS, discoverBody);
+    let disc: any;
+    try {
+      disc = await post(API_ENDPOINTS.DISCOVER_PROVIDERS, discoverBody);
+    } catch {
+      // Timeout on discover — retry once with longer patience
+      onStep('discover', 'running', 'Retrying discovery...');
+      try {
+        disc = await post(API_ENDPOINTS.DISCOVER_PROVIDERS, discoverBody);
+      } catch {
+        disc = { candidates: [], traces: [] };
+      }
+    }
     if (disc.traces) traces.push(...disc.traces);
     const candidateList = disc.candidates || [];
     result.candidates = candidateList;
-    onStep('discover', 'done', `${candidateList.length} providers found`);
+    onStep('discover', candidateList.length > 0 ? 'done' : 'warning', `${candidateList.length} providers found`);
 
     // 3. Rank
     onStep('rank', 'running', 'Ranking candidates...');
