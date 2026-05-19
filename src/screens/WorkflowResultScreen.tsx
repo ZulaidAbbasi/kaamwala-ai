@@ -3,7 +3,7 @@
 // Sections: Request Summary · Recommended Provider · Reasoning · Booking · Follow-up · Agent Workflow · Other Options
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { WorkflowResult } from '../services/workflow/runServiceWorkflow';
@@ -42,6 +42,24 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
   const others = candidates.filter((_: any, i: number) => sel ? candidates.indexOf(sel) !== i : i > 0).slice(0, 3);
   const [expandedMain, setExpandedMain] = useState(false);
   const [expandedOther, setExpandedOther] = useState<number | null>(null);
+  const [bookingProvider, setBookingProvider] = useState<string | null>(null);
+
+  // ── Book any provider ────────────────────────────────────────────────
+  const handleBookProvider = (provider: any) => {
+    if (bookingProvider) return; // prevent double-tap
+    setBookingProvider(provider.name || 'provider');
+    // Navigate to the full BookingScreen which calls the real createBooking API
+    navigation.navigate('Booking', {
+      workflowId: r.workflowId,
+      parsedRequest: p,
+      selectedProvider: provider,
+      priceEstimate: result.price || pr,
+    });
+    // Reset after short delay in case user comes back
+    setTimeout(() => setBookingProvider(null), 2000);
+  };
+
+  const result = r; // alias for booking navigation
 
   // Determine if provider is registered (bookable) vs Google Places only
   const isRegisteredProvider = sel?.isRegistered || sel?.bookingEligible || bk?.isRealBooking || bk?.providerSource === 'registered' || false;
@@ -190,6 +208,19 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
               ? badge('Internal Booking', C.deepGreen, '#D1FAE5')
               : badge('Google Places Data', C.teal, C.tealBg)}
           </View>
+          {/* Book button — primary CTA */}
+          <TouchableOpacity
+            style={s.bookBtn}
+            onPress={() => handleBookProvider(sel)}
+            activeOpacity={0.8}
+            disabled={bookingProvider === sel.name}
+          >
+            {bookingProvider === sel.name ? (
+              <ActivityIndicator size="small" color="#FFF" />
+            ) : (
+              <Text style={s.bookBtnText}>📋 Book This Provider</Text>
+            )}
+          </TouchableOpacity>
           {/* Action buttons */}
           <View style={s.actionRow}>
             {sel.googleMapsUri ? actionBtn('🗺 Open in Maps', C.teal, C.tealBg, () => openLink(sel.googleMapsUri, 'Could not open Google Maps.')) : null}
@@ -205,22 +236,44 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
         {/* ═══════════════════════════════════════════════════════════════
             SECTION 2.5 — Other Nearby Options (right after recommended)
             ═══════════════════════════════════════════════════════════════ */}
-        {others.length > 0 && sectionCard('📍 Other Nearby Options', C.muted, <>
-          {others.map((c: any, i: number) => (
-            <TouchableOpacity key={i} onPress={() => setExpandedOther(expandedOther === i ? null : i)} activeOpacity={0.7}>
-              <View style={s.otherRow}>
-                <View style={s.avatar}><Text style={s.avatarText}>{(c.name || '?')[0]}</Text></View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.otherName}>{safe(c.name, `Provider ${i + 1}`)}</Text>
-                  <Text style={s.providerMeta}>
-                    {c.rating ? `⭐ ${c.rating}` : ''}{c.reviewCount ? ` (${c.reviewCount})` : ''}{c.distanceEstimateKm ? ` · ${c.distanceEstimateKm} km` : ''}
-                  </Text>
+        {others.length > 0 && sectionCard('📍 Other Nearby Options — Tap to Book', C.muted, <>
+          {others.map((c: any, i: number) => {
+            const cIsReg = !!c.isRegistered;
+            return (
+            <View key={i}>
+              <TouchableOpacity onPress={() => setExpandedOther(expandedOther === i ? null : i)} activeOpacity={0.7}>
+                <View style={s.otherRow}>
+                  <View style={[s.avatar, cIsReg ? { backgroundColor: C.greenBg, borderColor: 'rgba(16,185,129,0.3)' } : {}]}>
+                    <Text style={[s.avatarText, cIsReg ? { color: C.green } : {}]}>{(c.name || '?')[0]}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.otherName}>{safe(c.name, `Provider ${i + 1}`)}</Text>
+                    <Text style={s.providerMeta}>
+                      {c.rating ? `⭐ ${c.rating}` : ''}{c.reviewCount ? ` (${c.reviewCount})` : ''}{c.distanceEstimateKm ? ` · ${c.distanceEstimateKm} km` : ''}
+                      {cIsReg ? ' · Registered ✓' : ''}
+                    </Text>
+                  </View>
+                  <Text style={s.expandArrow}>{expandedOther === i ? '▲' : '▼'}</Text>
                 </View>
-                <Text style={s.expandArrow}>{expandedOther === i ? '▲' : '▼'}</Text>
-              </View>
-              {expandedOther === i && providerDetailView(c)}
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+              {expandedOther === i && <>
+                {providerDetailView(c)}
+                <TouchableOpacity
+                  style={[s.bookBtn, { marginTop: 10, marginBottom: 6 }]}
+                  onPress={() => handleBookProvider(c)}
+                  activeOpacity={0.8}
+                  disabled={bookingProvider === c.name}
+                >
+                  {bookingProvider === c.name ? (
+                    <ActivityIndicator size="small" color="#FFF" />
+                  ) : (
+                    <Text style={s.bookBtnText}>📋 Book {safe(c.name, 'This Provider').substring(0, 20)}</Text>
+                  )}
+                </TouchableOpacity>
+              </>}
+            </View>
+            );
+          })}
         </>)}
 
         {/* ═══════════════════════════════════════════════════════════════
@@ -465,6 +518,10 @@ const s = StyleSheet.create({
   actionRow: { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: 8, marginTop: 14 },
   actionBtn: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, minHeight: 46, justifyContent: 'center' as const, borderWidth: 1, borderColor: C.border },
   actionBtnText: { fontSize: 14, fontWeight: '700' },
+
+  // Book button
+  bookBtn: { marginTop: 16, paddingVertical: 16, borderRadius: 14, alignItems: 'center' as const, justifyContent: 'center' as const, backgroundColor: C.deepGreen, minHeight: 52, borderWidth: 1.5, borderColor: C.borderAccent, shadowColor: C.green, shadowOffset: { width: 0, height: 4 } as const, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  bookBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800', letterSpacing: 0.3 },
 
   // Provider detail (expanded)
   detailBox: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 14, marginTop: 12, borderWidth: 1, borderColor: C.border },
