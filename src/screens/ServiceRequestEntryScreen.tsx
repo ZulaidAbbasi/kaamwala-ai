@@ -1,8 +1,8 @@
 // src/screens/ServiceRequestEntryScreen.tsx
 // Premium dark-mode service request entry
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
@@ -40,6 +40,60 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const micPulse = useRef(new Animated.Value(1)).current;
+  const recognitionRef = useRef<any>(null);
+
+  // Mic pulse animation
+  useEffect(() => {
+    if (isListening) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(micPulse, { toValue: 1.25, duration: 500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+          Animated.timing(micPulse, { toValue: 1, duration: 500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        ])
+      ).start();
+    } else {
+      micPulse.setValue(1);
+    }
+  }, [isListening]);
+
+  function handleMicPress() {
+    if (Platform.OS === 'web') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        Alert.alert('Not Supported', 'Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+        return;
+      }
+      if (isListening && recognitionRef.current) {
+        recognitionRef.current.stop();
+        setIsListening(false);
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'ur-PK'; // Urdu primary, also recognizes English/Roman Urdu
+      recognition.interimResults = false;
+      recognition.continuous = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setText((prev: string) => prev ? `${prev} ${transcript}` : transcript);
+        setIsListening(false);
+      };
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+    } else {
+      Alert.alert('Voice Input', 'Voice input is available on the web version. Please type your request here.');
+    }
+  }
 
   // Auto-request location on screen mount
   useEffect(() => {
@@ -117,8 +171,22 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
           <View style={[s.inputCard, isFocused && s.inputCardFocused]}>
             <View style={s.inputHeader}>
               <Text style={s.inputLabel}>SERVICE REQUEST</Text>
-              <View style={s.charBadge}>
-                <Text style={s.charCount}>{text.length}</Text>
+              <View style={s.inputHeaderRight}>
+                <TouchableOpacity
+                  style={[s.micBtn, isListening && s.micBtnActive]}
+                  onPress={handleMicPress}
+                  activeOpacity={0.7}
+                >
+                  <Animated.Text style={[s.micIcon, { transform: [{ scale: micPulse }] }]}>
+                    {isListening ? '🔴' : '🎤'}
+                  </Animated.Text>
+                  <Text style={[s.micLabel, isListening && s.micLabelActive]}>
+                    {isListening ? 'Listening...' : 'Speak'}
+                  </Text>
+                </TouchableOpacity>
+                <View style={s.charBadge}>
+                  <Text style={s.charCount}>{text.length}</Text>
+                </View>
               </View>
             </View>
             <TextInput
@@ -229,9 +297,15 @@ const s = StyleSheet.create({
   inputCard: { backgroundColor: C.inputBg, borderRadius: 16, padding: 16, borderWidth: 1.5, borderColor: C.border, marginBottom: 20 },
   inputCardFocused: { borderColor: C.borderFocus, backgroundColor: 'rgba(16,185,129,0.04)' },
   inputHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  inputHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   inputLabel: { fontSize: 11, fontWeight: '700', color: C.muted, letterSpacing: 1.2 },
   charBadge: { backgroundColor: C.surface, paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10, borderWidth: 1, borderColor: C.border },
   charCount: { fontSize: 11, fontWeight: '600', color: C.muted },
+  micBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: 'rgba(139,92,246,0.1)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)' },
+  micBtnActive: { backgroundColor: 'rgba(244,63,94,0.15)', borderColor: 'rgba(244,63,94,0.3)' },
+  micIcon: { fontSize: 16 },
+  micLabel: { fontSize: 11, fontWeight: '700', color: C.violet, letterSpacing: 0.3 },
+  micLabelActive: { color: C.rose },
   input: { fontSize: 16, color: C.text, lineHeight: 24, minHeight: 100, textAlignVertical: 'top' },
 
   sectionLabel: { fontSize: 11, fontWeight: '700', color: C.muted, letterSpacing: 1.2, marginBottom: 10 },
