@@ -260,7 +260,7 @@ const st = StyleSheet.create({
 
   title: { ...typography.headlineLg, marginTop: spacing.lg, marginBottom: spacing.xs },
   subtitle: { ...typography.bodySm, marginBottom: spacing.md },
-  badgeRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
+  badgeRow: { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: spacing.sm, marginBottom: spacing.xl },
 
   // Booking card
   bookingCard: {
@@ -282,8 +282,8 @@ const st = StyleSheet.create({
   providerName: { fontSize: 17, fontWeight: '700', color: colors.textPrimary },
   providerMeta: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
 
-  detailGrid: { flexDirection: 'row', gap: spacing.xl, marginBottom: spacing.lg },
-  detailCol: { flex: 1 },
+  detailGrid: { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: spacing.md, marginBottom: spacing.lg },
+  detailCol: { flex: 1, minWidth: 120 },
   detailLabel: { fontSize: 12, fontWeight: '600', color: colors.textMuted, textTransform: 'uppercase', marginBottom: 4 },
   detailValue: { fontSize: 15, fontWeight: '600', color: colors.textPrimary },
 
