@@ -254,7 +254,7 @@ export async function handleDiscoverProviders(req: Request, res: Response): Prom
           candidates[matchIdx].reviewCount = reg.completedJobs;
         }
         if ((!candidates[matchIdx].address || candidates[matchIdx].address === '') && reg.locationArea) {
-          candidates[matchIdx].address = reg.locationArea.toLowerCase().includes('islamabad') ? reg.locationArea : `${reg.locationArea}, Islamabad`;
+          candidates[matchIdx].address = reg.locationArea;
         }
       } else {
         // Add as separate registered candidate
@@ -269,6 +269,16 @@ export async function handleDiscoverProviders(req: Request, res: Response): Prom
                     Math.sin(dLon / 2) ** 2;
           regDistanceKm = Math.round(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 10) / 10;
           regTravelMinutes = Math.round(regDistanceKm * 3); // ~20km/h average in city
+        }
+
+        // ── Distance threshold: skip registered providers too far from user ──
+        // If the user's location is known and the provider is > 50km away,
+        // it doesn't make sense to recommend them (e.g. Islamabad provider for Multan user)
+        const MAX_REGISTERED_DISTANCE_KM = 50;
+        if (regDistanceKm !== null && regDistanceKm > MAX_REGISTERED_DISTANCE_KM) {
+          safeLog.info('DiscoverProviders', `Skipping registered provider "${reg.businessName}" — ${regDistanceKm} km away (max ${MAX_REGISTERED_DISTANCE_KM} km)`);
+          warnings.push(`Registered provider "${reg.businessName}" excluded — ${regDistanceKm} km away from your location.`);
+          continue;
         }
 
         // Check if provider is likely open now based on availability
@@ -296,7 +306,7 @@ export async function handleDiscoverProviders(req: Request, res: Response): Prom
           placeId: reg.placeId || null,
           providerId: reg.providerId,
           name: reg.businessName,
-          address: reg.locationArea.toLowerCase().includes('islamabad') ? reg.locationArea : `${reg.locationArea}, Islamabad`,
+          address: reg.locationArea || 'Service area',
           location: reg.geo || null,
           rating: reg.internalRating || null,
           reviewCount: reg.completedJobs || null,
