@@ -380,25 +380,43 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
             ═══════════════════════════════════════════════════════════════ */}
         {sectionCard('📅 Follow-up', C.purple, <>
           {r.followUp?.timeline && Array.isArray(r.followUp.timeline) && r.followUp.timeline.length > 0 ? <>
-            {r.followUp.timeline.slice(0, 8).map((evt: any, i: number) => (
-              <View key={i} style={s.traceStep}>
-                <Text style={s.traceStepText}>{safe(evt.title || evt.eventType, `Step ${evt.step}`)}</Text>
-                <Text style={[s.traceCheck, evt.status === 'completed' ? {} : evt.status === 'skipped' ? { color: C.muted } : { color: C.amber }]}>
-                  {evt.status === 'completed' ? '✓ Done' : evt.status === 'skipped' ? 'Skipped' : evt.status}
+            {r.followUp.timeline.slice(0, 8).map((evt: any, i: number) => {
+              const forcePending = bk?.status !== 'completed' && i > 1;
+              const displayStatus = forcePending ? 'pending' : evt.status;
+              const statusColor = displayStatus === 'completed' ? C.green : displayStatus === 'pending' ? C.amber : C.muted;
+              
+              return (
+                <View key={i} style={s.traceStep}>
+                  <Text style={s.traceStepText}>{safe(evt.title || evt.eventType, `Step ${evt.step}`)}</Text>
+                  <Text style={[s.traceCheck, { color: statusColor }]}>
+                    {displayStatus === 'completed' ? '✓ Done' : displayStatus === 'skipped' ? 'Skipped' : '⏳ Pending'}
+                  </Text>
+                </View>
+              );
+            })}
+            
+            {bk?.status === 'completed' ? <>
+              {r.followUp.feedback && <>
+                {row('Customer Rating', `${r.followUp.feedback.rating}/5 ${r.followUp.feedback.ratingLabel || ''}`)}
+                {r.followUp.feedback.comment && row('Comment', r.followUp.feedback.comment.substring(0, 60))}
+                {row('Would Recommend', r.followUp.feedback.wouldRecommend ? '✅ Yes' : '❌ No')}
+              </>}
+              {r.followUp.reputationUpdate && <>
+                {row('Provider Rating', `${r.followUp.reputationUpdate.previousRating} → ${r.followUp.reputationUpdate.newRating}`)}
+                {row('Completed Jobs', `${r.followUp.reputationUpdate.previousCompletedJobs} → ${r.followUp.reputationUpdate.newCompletedJobs}`)}
+              </>}
+              {r.followUp.firestoreSaved && row('Firestore', 'All events saved ✓')}
+              {row('Timeline Events', `${r.followUp.timeline.length} steps completed`)}
+            </> : <>
+              <View style={[s.detailBox, { marginTop: 12, backgroundColor: C.amberBg, borderColor: `${C.amber}30` }]}>
+                <Text style={[s.reasoningText, { color: C.amber }]}>
+                  This follow-up plan has been generated and scheduled. The simulation will execute when the provider completes the job in the Provider Dashboard.
                 </Text>
               </View>
-            ))}
-            {r.followUp.feedback && <>
-              {row('Customer Rating', `${r.followUp.feedback.rating}/5 ${r.followUp.feedback.ratingLabel || ''}`)}
-              {r.followUp.feedback.comment && row('Comment', r.followUp.feedback.comment.substring(0, 60))}
-              {row('Would Recommend', r.followUp.feedback.wouldRecommend ? '✅ Yes' : '❌ No')}
+              <TouchableOpacity style={s.traceBtn} onPress={() => navigation.navigate('ProviderAdmin')}>
+                <Text style={s.traceBtnText}>Open Provider Dashboard →</Text>
+              </TouchableOpacity>
             </>}
-            {r.followUp.reputationUpdate && <>
-              {row('Provider Rating', `${r.followUp.reputationUpdate.previousRating} → ${r.followUp.reputationUpdate.newRating}`)}
-              {row('Completed Jobs', `${r.followUp.reputationUpdate.previousCompletedJobs} → ${r.followUp.reputationUpdate.newCompletedJobs}`)}
-            </>}
-            {r.followUp.firestoreSaved && row('Firestore', 'All events saved ✓')}
-            {row('Timeline Events', `${r.followUp.timeline.length} steps completed`)}
           </> : <>
             {row('Reminder', 'Scheduled: 1 hour before appointment')}
             {row('Status Update', 'Provider confirmation prepared')}

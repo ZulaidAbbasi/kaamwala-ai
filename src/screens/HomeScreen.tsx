@@ -99,6 +99,42 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           <StatusBadge label="Places Ready" variant="info" />
         </View>
 
+        {/* ── Notifications ── */}
+        <SectionCard title="🔔 Notifications & Follow-Ups" accent="amber">
+          {result?.bookingResult ? (
+            result.bookingResult.status === 'completed' ? (
+              <View style={s.notifRow}>
+                <Text style={s.notifIcon}>⭐</Text>
+                <View style={s.notifContent}>
+                  <Text style={s.notifTitle}>Job Completed & Rated</Text>
+                  <Text style={s.notifText}>Your {result.parsedRequest?.serviceType || 'service'} with {result.selectedProvider?.name} was completed. Thank you for your 4.5/5 rating!</Text>
+                  <Text style={s.notifTime}>Just now</Text>
+                </View>
+              </View>
+            ) : (
+              <View style={s.notifRow}>
+                <Text style={s.notifIcon}>⏳</Text>
+                <View style={s.notifContent}>
+                  <Text style={s.notifTitle}>Awaiting Provider Confirmation</Text>
+                  <Text style={s.notifText}>Your {result.parsedRequest?.serviceType || 'service'} booking is sent to {result.selectedProvider?.name}. Follow-up timeline is scheduled.</Text>
+                  <Text style={s.notifTime}>Just now</Text>
+                  <TouchableOpacity style={s.notifBtn} onPress={() => navigation.navigate('ProviderAdmin')}>
+                    <Text style={s.notifBtnText}>Open Provider Dashboard to Accept →</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )
+          ) : (
+            <View style={s.notifRow}>
+              <Text style={s.notifIcon}>✅</Text>
+              <View style={s.notifContent}>
+                <Text style={s.notifTitle}>All caught up!</Text>
+                <Text style={s.notifText}>No active bookings or follow-ups. Run a service request to start the agentic workflow.</Text>
+              </View>
+            </View>
+          )}
+        </SectionCard>
+
         {/* ── Primary CTA ── */}
         <View style={s.ctaSection}>
           <ActionButton
@@ -335,7 +371,17 @@ const s = StyleSheet.create({
 
   // Demo input
   demoTextBox: { backgroundColor: colors.surfaceContainer, padding: spacing.lg, borderRadius: radius.lg },
-  demoText: { fontSize: 15, color: colors.textPrimary, lineHeight: 24, fontStyle: 'italic' },
+  demoText: { fontSize: 15, color: colors.textPrimary, fontStyle: 'italic', lineHeight: 22 },
+
+  // Notifications
+  notifRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  notifIcon: { fontSize: 24, marginTop: 2 },
+  notifContent: { flex: 1 },
+  notifTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 },
+  notifText: { fontSize: 14, color: colors.textSecondary, lineHeight: 20 },
+  notifTime: { fontSize: 12, color: colors.textMuted, marginTop: 6 },
+  notifBtn: { marginTop: 12, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: colors.surfaceContainerHigh, borderRadius: radius.md, alignSelf: 'flex-start', borderWidth: 1, borderColor: colors.borderLight },
+  notifBtnText: { fontSize: 12, fontWeight: '700', color: colors.amber },
 
   // Result header
   resultHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.xl, marginBottom: spacing.md },
