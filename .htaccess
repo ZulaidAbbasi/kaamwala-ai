@@ -1,9 +1,16 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
-# If the request is NOT already pointing to the dist folder...
-RewriteCond %{REQUEST_URI} !^/dist/
+# If someone hits /dist/... URL directly, redirect to clean URL (remove /dist/)
+RewriteCond %{THE_REQUEST} \s/dist/(\S*) [NC]
+RewriteRule ^ /%1 [R=301,L]
 
-# ...rewrite the request to the dist folder transparently
+# Internally serve all requests from the dist folder
+RewriteCond %{REQUEST_URI} !^/dist/
 RewriteRule ^(.*)$ /dist/$1 [L]
+
+# SPA fallback: serve index.html for all non-file routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ /dist/index.html [L]
 </IfModule>
