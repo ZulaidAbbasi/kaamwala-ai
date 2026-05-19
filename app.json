@@ -29,7 +29,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow KaamWala AI to use the microphone for voice input.",
+          "speechRecognitionPermission": "Allow KaamWala AI to use speech recognition for voice commands."
+        }
+      ]
     ],
     "extra": {
       "eas": {

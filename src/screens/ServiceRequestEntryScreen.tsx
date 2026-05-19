@@ -6,6 +6,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 
 const C = {
   bgDark: '#0B0F1A', bgCard: '#141B2B', surface: 'rgba(255,255,255,0.06)',
@@ -44,6 +45,16 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
   const micPulse = useRef(new Animated.Value(1)).current;
   const recognitionRef = useRef<any>(null);
 
+  // Native speech recognition events (mobile)
+  useSpeechRecognitionEvent('result', (event) => {
+    if (event.results?.[0]?.transcript) {
+      const transcript = event.results[0].transcript;
+      setText((prev: string) => prev ? `${prev} ${transcript}` : transcript);
+    }
+  });
+  useSpeechRecognitionEvent('end', () => setIsListening(false));
+  useSpeechRecognitionEvent('error', () => setIsListening(false));
+
   // Mic pulse animation
   useEffect(() => {
     if (isListening) {
@@ -58,40 +69,53 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
     }
   }, [isListening]);
 
-  function handleMicPress() {
+  async function handleMicPress() {
+    if (isListening) {
+      // Stop listening
+      if (Platform.OS === 'web' && recognitionRef.current) {
+        recognitionRef.current.stop();
+      } else {
+        ExpoSpeechRecognitionModule.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
     if (Platform.OS === 'web') {
+      // Web Speech API
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (!SpeechRecognition) {
         Alert.alert('Not Supported', 'Speech recognition is not supported in this browser. Please use Chrome or Edge.');
         return;
       }
-      if (isListening && recognitionRef.current) {
-        recognitionRef.current.stop();
-        setIsListening(false);
-        return;
-      }
       const recognition = new SpeechRecognition();
-      recognition.lang = 'ur-PK'; // Urdu primary, also recognizes English/Roman Urdu
+      recognition.lang = 'ur-PK';
       recognition.interimResults = false;
       recognition.continuous = false;
       recognition.maxAlternatives = 1;
-
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         setText((prev: string) => prev ? `${prev} ${transcript}` : transcript);
         setIsListening(false);
       };
-      recognition.onerror = () => {
-        setIsListening(false);
-      };
-      recognition.onend = () => {
-        setIsListening(false);
-      };
+      recognition.onerror = () => setIsListening(false);
+      recognition.onend = () => setIsListening(false);
       recognitionRef.current = recognition;
       recognition.start();
       setIsListening(true);
     } else {
-      Alert.alert('Voice Input', 'Voice input is available on the web version. Please type your request here.');
+      // Native speech recognition (Android/iOS)
+      const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      if (!granted) {
+        Alert.alert('Permission Required', 'Please allow microphone access to use voice input.');
+        return;
+      }
+      ExpoSpeechRecognitionModule.start({
+        lang: 'ur-PK',
+        interimResults: false,
+        continuous: false,
+      });
+      setIsListening(true);
     }
   }
 
