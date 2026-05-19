@@ -54,21 +54,19 @@ export async function handleProviderCancellation(input: {
   const serviceType = booking?.serviceType || 'Service';
   const isRegistered = booking?.isRegisteredProvider ?? false;
 
-  // Update booking status to cancelled
+  // ── SIMULATION ONLY — do NOT cancel the real booking ──
+  // The recovery agent demonstrates recovery capability without destroying
+  // the actual booking record. Provider Dashboard remains functional.
   let firestoreSaved = false;
   try {
-    await db.collection('bookings').doc(bookingId).update({
-      status: 'cancelled',
-      updatedAt: Timestamp.now(),
-    });
-
-    await db.collection('booking_events').doc(`evt_${bookingId}_cancelled`).set({
+    // Log the recovery simulation event (does NOT touch the booking document)
+    await db.collection('booking_events').doc(`evt_${bookingId}_recovery_sim`).set({
       bookingId, workflowId,
-      eventType: 'provider_cancelled',
-      description: `Provider "${providerName}" cancelled the booking.`,
-      oldStatus: booking?.status || 'pending_provider_confirmation',
-      newStatus: 'cancelled',
-      actor: 'provider_simulation',
+      eventType: 'recovery_simulation',
+      description: `Recovery simulation: Provider "${providerName}" cancellation scenario tested.`,
+      simulatedStatus: 'cancelled',
+      actualStatus: booking?.status || 'pending_provider_confirmation',
+      actor: 'recovery_agent_simulation',
       createdAt: Timestamp.now(),
     });
 
@@ -77,13 +75,14 @@ export async function handleProviderCancellation(input: {
       scenarioType: 'provider_cancellation',
       originalProvider: providerName,
       recoveryAction: 'search_replacement',
+      simulation: true,
       createdAt: Timestamp.now(),
     });
 
     firestoreSaved = true;
   } catch (e: any) {
-    safeLog.error('FallbackService', 'Failed to update booking', e);
-    warnings.push('Booking status may not have been updated.');
+    safeLog.error('FallbackService', 'Failed to log recovery event', e);
+    warnings.push('Recovery event logging failed.');
   }
 
   // Generate apology
