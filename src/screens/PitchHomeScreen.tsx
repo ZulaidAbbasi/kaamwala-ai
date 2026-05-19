@@ -66,23 +66,41 @@ export default function PitchHomeScreen({ navigation }: { navigation: any }) {
     ).start();
   }, []);
 
-  // Fetch latest booking for alerts
-  const [booking, setBooking] = useState<any>(null);
-  const [alertCount, setAlertCount] = useState(0);
+  // Fetch bookings and generate dynamic alerts
+  const [alerts, setAlerts] = useState<Array<{icon: string; title: string; text: string; time: string; color: string}>>([]);
 
   useEffect(() => {
-    const fetchBooking = async () => {
+    const fetchBookings = async () => {
       try {
         const r = await fetch('https://us-central1-kaamwala-ai.cloudfunctions.net/api/bookings');
         const data = await r.json();
         if (data.success && data.bookings?.length > 0) {
-          setBooking(data.bookings[0]);
-          setAlertCount(data.bookings.length);
+          const generated: Array<{icon: string; title: string; text: string; time: string; color: string}> = [];
+          const now = Date.now();
+          data.bookings.slice(0, 5).forEach((b: any, i: number) => {
+            const mins = Math.floor((now - new Date(b.createdAt || now).getTime()) / 60000);
+            const timeStr = mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.floor(mins/60)}h ago` : `${Math.floor(mins/1440)}d ago`;
+            // Booking status alert
+            if (b.status === 'completed') {
+              generated.push({ icon: '⭐', title: 'Service Completed', text: `${b.providerName} — Rate your experience`, time: timeStr, color: C.amber });
+              generated.push({ icon: '📝', title: 'Feedback Requested', text: `How was ${b.providerName}? Tap to review`, time: timeStr, color: C.cyan });
+            } else if (b.status === 'confirmed') {
+              generated.push({ icon: '🚗', title: 'Provider Accepted', text: `${b.providerName} is on the way`, time: timeStr, color: C.emerald });
+              generated.push({ icon: '⏰', title: 'ETA Reminder', text: `${b.serviceType} — arriving in ~30 min`, time: timeStr, color: C.cyan });
+            } else {
+              generated.push({ icon: '⏳', title: 'Awaiting Confirmation', text: `${b.providerName} — ${b.serviceType}`, time: timeStr, color: C.amber });
+            }
+            // Follow-up alerts for all
+            if (i === 0) {
+              generated.push({ icon: '🔄', title: 'Follow-Up Active', text: `10-step lifecycle running for ${b.serviceType}`, time: 'Just now', color: C.violet });
+            }
+          });
+          setAlerts(generated.slice(0, 6));
         }
       } catch { /* silent */ }
     };
-    const unsub = navigation.addListener('focus', fetchBooking);
-    fetchBooking();
+    const unsub = navigation.addListener('focus', fetchBookings);
+    fetchBookings();
     return unsub;
   }, [navigation]);
 
@@ -145,47 +163,37 @@ export default function PitchHomeScreen({ navigation }: { navigation: any }) {
           </View>
 
           {/* ──── Alerts / Notifications ──── */}
-          <View style={s.alertsCard}>
-            <View style={s.alertsHeader}>
-              <View style={s.alertsBellWrap}>
-                <Text style={s.alertsBellIcon}>🔔</Text>
-                {alertCount > 0 && (
+          {alerts.length > 0 && (
+            <View style={s.alertsCard}>
+              <View style={s.alertsHeader}>
+                <View style={s.alertsBellWrap}>
+                  <Text style={s.alertsBellIcon}>🔔</Text>
                   <View style={s.alertsBadge}>
-                    <Text style={s.alertsBadgeText}>{alertCount}</Text>
+                    <Text style={s.alertsBadgeText}>{alerts.length}</Text>
                   </View>
-                )}
-              </View>
-              <Text style={s.alertsTitle}>Alerts & Follow-Ups</Text>
-            </View>
-            {booking ? (
-              <TouchableOpacity
-                style={s.alertItem}
-                activeOpacity={0.7}
-                onPress={() => navigation.navigate('ProviderAdmin')}
-              >
-                <Text style={s.alertItemIcon}>
-                  {booking.status === 'completed' ? '⭐' : booking.status === 'confirmed' ? '🚗' : '⏳'}
-                </Text>
-                <View style={s.alertItemContent}>
-                  <Text style={s.alertItemTitle}>
-                    {booking.status === 'completed' ? 'Job Completed' : booking.status === 'confirmed' ? 'Provider En Route' : 'Awaiting Confirmation'}
-                  </Text>
-                  <Text style={s.alertItemText}>
-                    {booking.serviceType} — {booking.providerName}
-                  </Text>
-                  <Text style={s.alertItemTime}>
-                    {booking.status === 'completed' ? '✅ Completed' : booking.status === 'confirmed' ? '🟢 Accepted' : '🟡 Pending'}
-                    {' · Tap to manage'}
-                  </Text>
                 </View>
-                <Text style={s.alertItemArrow}>→</Text>
-              </TouchableOpacity>
-            ) : (
-              <View style={s.alertEmpty}>
-                <Text style={s.alertEmptyText}>✅ No active alerts. Run a service request to start.</Text>
+                <Text style={s.alertsTitle}>Alerts & Follow-Ups</Text>
               </View>
-            )}
-          </View>
+              {alerts.map((a, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[s.alertItem, i > 0 && { marginTop: 8 }]}
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate('ProviderAdmin')}
+                >
+                  <Text style={s.alertItemIcon}>{a.icon}</Text>
+                  <View style={s.alertItemContent}>
+                    <Text style={s.alertItemTitle}>{a.title}</Text>
+                    <Text style={s.alertItemText}>{a.text}</Text>
+                  </View>
+                  <View style={s.alertItemRight}>
+                    <Text style={s.alertItemTime}>{a.time}</Text>
+                    <View style={[s.alertDot, { backgroundColor: a.color }]} />
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
           {/* ──── Primary CTA ──── */}
           <TouchableOpacity
@@ -341,20 +349,19 @@ const s = StyleSheet.create({
   footerSub: { fontSize: 11, color: 'rgba(100,116,139,0.6)', marginTop: 5, textAlign: 'center' },
 
   // Alerts
-  alertsCard: { backgroundColor: 'rgba(245,158,11,0.04)', borderRadius: 20, padding: 20, marginTop: 24, borderWidth: 1, borderColor: 'rgba(245,158,11,0.12)' },
+  alertsCard: { backgroundColor: 'rgba(245,158,11,0.04)', borderRadius: 20, padding: 18, marginTop: 24, borderWidth: 1, borderColor: 'rgba(245,158,11,0.12)' },
   alertsHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   alertsBellWrap: { position: 'relative' },
   alertsBellIcon: { fontSize: 24 },
-  alertsBadge: { position: 'absolute', top: -4, right: -6, backgroundColor: '#F43F5E', borderRadius: 10, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  alertsBadge: { position: 'absolute', top: -4, right: -8, backgroundColor: '#F43F5E', borderRadius: 10, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
   alertsBadgeText: { fontSize: 10, fontWeight: '800', color: '#FFF' },
   alertsTitle: { fontSize: 18, fontWeight: '800', color: '#F59E0B', letterSpacing: -0.2 },
-  alertItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 14, padding: 14, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
-  alertItemIcon: { fontSize: 28 },
+  alertItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 14, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  alertItemIcon: { fontSize: 22 },
   alertItemContent: { flex: 1 },
-  alertItemTitle: { fontSize: 15, fontWeight: '700', color: '#F1F5F9', marginBottom: 3 },
-  alertItemText: { fontSize: 13, color: 'rgba(148,163,184,0.85)' },
-  alertItemTime: { fontSize: 11, color: 'rgba(100,116,139,0.7)', marginTop: 4, letterSpacing: 0.3 },
-  alertItemArrow: { fontSize: 18, fontWeight: '700', color: '#F59E0B' },
-  alertEmpty: { paddingVertical: 8 },
-  alertEmptyText: { fontSize: 13, color: 'rgba(100,116,139,0.6)' },
+  alertItemTitle: { fontSize: 14, fontWeight: '700', color: '#F1F5F9', marginBottom: 2 },
+  alertItemText: { fontSize: 12, color: 'rgba(148,163,184,0.75)' },
+  alertItemRight: { alignItems: 'flex-end', gap: 6 },
+  alertItemTime: { fontSize: 10, color: 'rgba(100,116,139,0.6)', letterSpacing: 0.3 },
+  alertDot: { width: 8, height: 8, borderRadius: 4 },
 });
