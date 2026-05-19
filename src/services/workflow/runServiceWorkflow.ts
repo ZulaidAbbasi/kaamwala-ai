@@ -81,32 +81,48 @@ export async function runServiceWorkflow(
   try {
     // 1. Parse
     onStep('parse', 'running', 'Understanding request...');
-    const p = await post(API_ENDPOINTS.PARSE_REQUEST, { rawText });
-    if (p.traces) traces.push(...p.traces);
-    if (!p.success && p.parsedRequest?.confidenceScore === 0) {
-      // All AI models busy — retry once after a short delay
-      onStep('parse', 'running', 'AI busy, retrying...');
-      await new Promise(r => setTimeout(r, 2000));
-      const p2 = await post(API_ENDPOINTS.PARSE_REQUEST, { rawText });
-      if (p2.traces) traces.push(...p2.traces);
-      if (p2.success || (p2.parsedRequest?.confidenceScore ?? 0) > 0) {
-        result.parsed = p2.parsedRequest;
-        result.workflowId = p2.workflowId;
+    let parseSuccess = false;
+    try {
+      const p = await post(API_ENDPOINTS.PARSE_REQUEST, { rawText });
+      if (p.traces) traces.push(...p.traces);
+      if (!p.success && p.parsedRequest?.confidenceScore === 0) {
+        // All AI models busy — retry once after a short delay
+        onStep('parse', 'running', 'AI busy, retrying...');
+        await new Promise(r => setTimeout(r, 2500));
+        try {
+          const p2 = await post(API_ENDPOINTS.PARSE_REQUEST, { rawText });
+          if (p2.traces) traces.push(...p2.traces);
+          if (p2.success || (p2.parsedRequest?.confidenceScore ?? 0) > 0) {
+            result.parsed = p2.parsedRequest;
+            result.workflowId = p2.workflowId;
+            parseSuccess = true;
+          } else {
+            result.parsed = p.parsedRequest;
+            result.workflowId = p.workflowId;
+          }
+        } catch {
+          result.parsed = p.parsedRequest;
+          result.workflowId = p.workflowId;
+        }
       } else {
         result.parsed = p.parsedRequest;
         result.workflowId = p.workflowId;
+        parseSuccess = p.success !== false;
       }
-    } else {
-      result.parsed = p.parsedRequest;
-      result.workflowId = p.workflowId;
+    } catch {
+      onStep('parse', 'warning', 'Parse timeout — using defaults');
     }
     onStep('parse', result.parsed?.confidenceScore > 0 ? 'done' : 'warning', clean(result.parsed?.serviceType, 'Intent extracted'));
+
+    // Use consistent references for all subsequent steps
+    const wfId = result.workflowId || `wf_fallback_${Date.now()}`;
+    const parsedReq = result.parsed || { serviceType: rawText.substring(0, 50), locationText: 'Islamabad', urgency: 'standard' };
 
     // 2. Discover — pass coordinates if GPS available
     onStep('discover', 'running', 'Searching providers...');
     const discoverBody: any = {
-      workflowId: p.workflowId,
-      parsedRequest: p.parsedRequest,
+      workflowId: wfId,
+      parsedRequest: parsedReq,
     };
 
     // If GPS coordinates available, pass them directly
@@ -137,67 +153,93 @@ export async function runServiceWorkflow(
         disc = { candidates: [], traces: [] };
       }
     }
-    if (disc.traces) traces.push(...disc.traces);
-    const candidateList = disc.candidates || [];
+    if (disc?.traces) traces.push(...disc.traces);
+    const candidateList = disc?.candidates || [];
     result.candidates = candidateList;
     onStep('discover', candidateList.length > 0 ? 'done' : 'warning', `${candidateList.length} providers found`);
 
     // 3. Rank
     onStep('rank', 'running', 'Ranking candidates...');
-    if (candidateList.length > 0) {
-      const rk = await post(API_ENDPOINTS.RANK_PROVIDERS, {
-        workflowId: p.workflowId, parsedRequest: p.parsedRequest, providerCandidates: candidateList,
-      });
-      if (rk.traces) traces.push(...rk.traces);
-      const rankedList = rk.rankedProviders || [];
-      result.ranked = rankedList;
-      result.selected = rk.selectedProvider || (rankedList.length > 0 ? rankedList[0] : null);
-      onStep('rank', 'done', result.selected?.name ? `Selected: ${result.selected.name.substring(0, 25)}` : 'Ranked');
-    } else {
-      onStep('rank', 'warning', 'No candidates to rank');
+    try {
+      if (candidateList.length > 0) {
+        const rk = await post(API_ENDPOINTS.RANK_PROVIDERS, {
+          workflowId: wfId, parsedRequest: parsedReq, providerCandidates: candidateList,
+        });
+        if (rk.traces) traces.push(...rk.traces);
+        const rankedList = rk.rankedProviders || [];
+        result.ranked = rankedList;
+        result.selected = rk.selectedProvider || (rankedList.length > 0 ? rankedList[0] : null);
+        onStep('rank', 'done', result.selected?.name ? `Selected: ${result.selected.name.substring(0, 25)}` : 'Ranked');
+      } else {
+        onStep('rank', 'warning', 'No candidates to rank');
+      }
+    } catch {
+      onStep('rank', 'warning', 'Ranking error');
     }
 
     // 4. Price
     onStep('price', 'running', 'Estimating price...');
-    if (result.selected) {
-      const pr = await post(API_ENDPOINTS.ESTIMATE_PRICE, {
-        workflowId: p.workflowId, parsedRequest: p.parsedRequest, selectedProvider: result.selected,
-      });
-      if (pr.traces) traces.push(...pr.traces);
-      result.price = pr.estimate || null;
-      onStep('price', 'done', result.price?.recommendedEstimate ? `PKR ${result.price.recommendedEstimate}` : 'Estimated');
-    } else {
-      onStep('price', 'warning', 'No provider selected');
+    try {
+      if (result.selected) {
+        const pr = await post(API_ENDPOINTS.ESTIMATE_PRICE, {
+          workflowId: wfId, parsedRequest: parsedReq, selectedProvider: result.selected,
+        });
+        if (pr.traces) traces.push(...pr.traces);
+        result.price = pr.estimate || null;
+        onStep('price', 'done', result.price?.recommendedEstimate ? `PKR ${result.price.recommendedEstimate}` : 'Estimated');
+      } else {
+        onStep('price', 'warning', 'No provider selected');
+      }
+    } catch {
+      onStep('price', 'warning', 'Price estimation timeout');
     }
 
     // 5. Book
     onStep('book', 'running', 'Creating booking...');
-    if (result.selected) {
-      const bk = await post(API_ENDPOINTS.CREATE_BOOKING, {
-        workflowId: p.workflowId, selectedProvider: result.selected,
-        parsedRequest: p.parsedRequest, priceEstimate: result.price,
-      });
-      if (bk.traces) traces.push(...bk.traces);
-      result.booking = bk.booking || null;
-      onStep('book', 'done', result.booking?.firestoreSaved ? 'Firestore saved' : 'Record created');
-    } else {
-      onStep('book', 'warning', 'No provider to book');
+    try {
+      if (result.selected) {
+        const bk = await post(API_ENDPOINTS.CREATE_BOOKING, {
+          workflowId: wfId, selectedProvider: result.selected,
+          parsedRequest: parsedReq, priceEstimate: result.price,
+        });
+        if (bk.traces) traces.push(...bk.traces);
+        result.booking = bk.booking || null;
+        onStep('book', 'done', result.booking?.firestoreSaved ? 'Firestore saved ✓' : 'Record created');
+      } else {
+        onStep('book', 'warning', 'No provider to book');
+      }
+    } catch {
+      onStep('book', 'warning', 'Booking timeout');
     }
 
-    // 6. Follow-Up
+    // 6. Follow-Up — store full response so result screen can display timeline
     onStep('followup', 'running', 'Preparing follow-up...');
     try {
       const fu = await post(API_ENDPOINTS.SIMULATE_FOLLOW_UP, {
-        workflowId: p.workflowId, bookingId: result.booking?.bookingId || 'demo',
+        workflowId: wfId, bookingId: result.booking?.bookingId || `demo_${Date.now()}`,
       });
       if (fu.traces) traces.push(...fu.traces);
-      result.followUp = fu.events || fu;
+      // Store the full follow-up result (has timeline, checklist, feedback, etc.)
+      result.followUp = {
+        timeline: fu.timeline || [],
+        checklist: fu.checklist || [],
+        feedback: fu.feedback || null,
+        reputationUpdate: fu.reputationUpdate || null,
+        firestoreSaved: fu.firestoreSaved || false,
+      };
       traces.push(
         { phase: 'follow_up', decision: 'Reminder scheduled: 1 hour before appointment', confidence: 1 },
-        { phase: 'follow_up', decision: 'Feedback request prepared', confidence: 1 },
+        { phase: 'follow_up', decision: `${(fu.timeline || []).length} lifecycle events simulated`, confidence: 1 },
       );
-      onStep('followup', 'done', 'Automation prepared');
+      onStep('followup', 'done', `${(fu.timeline || []).length} events simulated`);
     } catch {
+      // Even on failure, provide structured follow-up data
+      result.followUp = {
+        timeline: [],
+        checklist: [],
+        feedback: null,
+        firestoreSaved: false,
+      };
       onStep('followup', 'warning', 'Follow-up partial');
     }
 
@@ -205,12 +247,12 @@ export async function runServiceWorkflow(
     onStep('recover', 'running', 'Testing recovery...');
     try {
       const rv = await post(API_ENDPOINTS.RESOLVE_DISPUTE, {
-        workflowId: p.workflowId, scenario: 'provider_cancellation',
-        bookingId: result.booking?.bookingId || 'demo', rawText, confidence: 0.85,
+        workflowId: wfId, scenario: 'provider_cancellation',
+        bookingId: result.booking?.bookingId || `demo_${Date.now()}`, rawText, confidence: 0.85,
       });
       if (rv.traces) traces.push(...rv.traces);
       result.recovery = rv.recovery || null;
-      onStep('recover', 'done', 'Recovery tested');
+      onStep('recover', 'done', 'Recovery tested ✓');
     } catch {
       onStep('recover', 'warning', 'Recovery simulation partial');
     }

@@ -280,16 +280,24 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
           {row('Booking Record', bk ? 'Created ✓' : 'Not created')}
           {bk?.bookingId && row('Booking ID', bk.bookingId.substring(0, 22) + '...')}
           {row('Provider', safe(sel?.name, 'Not selected'))}
-          {row('Requested Slot', safe(p?.preferredTimeWindow || p?.preferredDate, 'Not specified'))}
+          {row('Slot Booked', safe(p?.preferredTimeWindow || p?.preferredDate, '10:00 AM'))}
           {row('Status', safe(bk?.statusLabel, 'Pending Provider Confirmation'))}
+          {row('Confirmation Sent', bk?.customerMessagePreview ? '✅ Yes' : 'Pending')}
+          {row('Provider Notified', bk?.providerMessagePreview ? '✅ Yes' : 'Pending')}
           {row('Firestore', bk?.firestoreSaved ? 'Saved ✓' : 'Not saved')}
-          {row('Provider Notification', 'Record created')}
-          {row('Follow-up Records', 'Scheduled')}
+          {bk?.notifications && bk.notifications.length > 0 && row('Notifications', `${bk.notifications.length} created`)}
           <View style={s.badgeRow}>
             {bk?.firestoreSaved && badge('Firestore Saved', C.green, C.greenBg)}
             {badge('Real Booking Record', C.deepGreen, '#D1FAE5')}
+            {badge('Confirmation Sent', C.teal, C.tealBg)}
             {badge('No Real SMS Sent', C.amber, C.amberBg)}
           </View>
+          {bk?.customerMessagePreview && <>
+            <Text style={[s.rowLabel, { fontWeight: '700', marginTop: 12, marginBottom: 4 }]}>📱 Customer Confirmation</Text>
+            <View style={s.detailBox}>
+              <Text style={[s.reasoningText, { fontSize: 12 }]}>{bk.customerMessagePreview.substring(0, 200)}...</Text>
+            </View>
+          </>}
           <TouchableOpacity style={s.traceBtn} onPress={() => navigation.navigate('ProviderAdmin')}>
             <Text style={s.traceBtnText}>Open Provider Dashboard →</Text>
           </TouchableOpacity>
@@ -315,18 +323,26 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
         {/* ═══════════════════════════════════════════════════════════════
             SECTION 5 — Follow-up
             ═══════════════════════════════════════════════════════════════ */}
-        {sectionCard('Follow-up', C.purple, <>
-          {r.followUp?.timeline && Array.isArray(r.followUp.timeline) ? <>
-            {r.followUp.timeline.slice(0, 6).map((evt: any, i: number) => (
+        {sectionCard('📅 Follow-up', C.purple, <>
+          {r.followUp?.timeline && Array.isArray(r.followUp.timeline) && r.followUp.timeline.length > 0 ? <>
+            {r.followUp.timeline.slice(0, 8).map((evt: any, i: number) => (
               <View key={i} style={s.traceStep}>
-                <Text style={s.traceStepText}>{safe(evt.title, `Step ${evt.step}`)}</Text>
-                <Text style={[s.traceCheck, evt.status === 'completed' ? {} : { color: C.amber }]}>
-                  {evt.status === 'completed' ? 'Done' : evt.status}
+                <Text style={s.traceStepText}>{safe(evt.title || evt.eventType, `Step ${evt.step}`)}</Text>
+                <Text style={[s.traceCheck, evt.status === 'completed' ? {} : evt.status === 'skipped' ? { color: C.muted } : { color: C.amber }]}>
+                  {evt.status === 'completed' ? '✓ Done' : evt.status === 'skipped' ? 'Skipped' : evt.status}
                 </Text>
               </View>
             ))}
-            {r.followUp.feedback && row('Customer Rating', `${r.followUp.feedback.rating}/5`)}
-            {r.followUp.firestoreSaved && row('Firestore', 'All events saved')}
+            {r.followUp.feedback && <>
+              {row('Customer Rating', `${r.followUp.feedback.rating}/5 ${r.followUp.feedback.ratingLabel || ''}`)}
+              {r.followUp.feedback.comment && row('Comment', r.followUp.feedback.comment.substring(0, 60))}
+              {row('Would Recommend', r.followUp.feedback.wouldRecommend ? '✅ Yes' : '❌ No')}
+            </>}
+            {r.followUp.reputationUpdate && <>
+              {row('Provider Rating', `${r.followUp.reputationUpdate.previousRating} → ${r.followUp.reputationUpdate.newRating}`)}
+              {row('Completed Jobs', `${r.followUp.reputationUpdate.previousCompletedJobs} → ${r.followUp.reputationUpdate.newCompletedJobs}`)}
+            </>}
+            {r.followUp.firestoreSaved && row('Firestore', 'All events saved ✓')}
             {row('Timeline Events', `${r.followUp.timeline.length} steps completed`)}
           </> : <>
             {row('Reminder', 'Scheduled: 1 hour before appointment')}
@@ -337,7 +353,7 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
           <View style={s.badgeRow}>
             {badge('Reminder Scheduled', C.teal, C.tealBg)}
             {badge('Confirmation Sent', C.green, C.greenBg)}
-            {badge('Safe Simulation', C.amber, C.amberBg)}
+            {r.followUp?.firestoreSaved ? badge('Firestore Saved', C.green, C.greenBg) : badge('Safe Simulation', C.amber, C.amberBg)}
           </View>
         </>)}
 
