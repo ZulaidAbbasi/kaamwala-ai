@@ -64,19 +64,22 @@ export const SectionCard: React.FC<SectionCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.borderLight,
+    borderColor: 'rgba(255,255,255,0.06)',
     overflow: 'hidden',
     flexDirection: 'row',
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.lg,
+    ...shadows.card,
   },
   accentBar: {
-    width: 4,
+    width: 3,
   },
   content: {
     flex: 1,
-    padding: spacing.lg,
+    padding: spacing.lg + 2,
   },
   contentAccented: {
     paddingLeft: spacing.md,
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: spacing.md,
+    marginBottom: spacing.md + 2,
   },
   headerText: {
     flex: 1,
@@ -96,14 +99,18 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.headlineSm,
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   subtitle: {
     ...typography.bodySm,
-    marginTop: 2,
+    marginTop: 3,
+    fontSize: 13,
   },
   divider: {
     height: 1,
-    backgroundColor: colors.borderLight,
+    backgroundColor: 'rgba(255,255,255,0.06)',
     marginVertical: spacing.md,
   },
 });

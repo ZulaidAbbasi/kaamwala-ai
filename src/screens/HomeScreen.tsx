@@ -388,92 +388,92 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: '#070A12' },
   scroll: { flex: 1 },
-  scrollContent: { paddingBottom: 20, maxWidth: 960, alignSelf: 'center' as const, width: '100%' as any },
+  scrollContent: { paddingBottom: 32, maxWidth: 960, alignSelf: 'center' as const, width: '100%' as any },
 
   // Hero
-  hero: { alignItems: 'center', paddingTop: 28, paddingBottom: 8, paddingHorizontal: spacing.xl },
-  title: { fontSize: 30, fontWeight: '700', color: colors.primaryDark, letterSpacing: -0.5 },
-  tagline: { fontSize: 15, color: colors.textSecondary, marginTop: 8, textAlign: 'center', lineHeight: 22 },
-  poweredByRow: { marginTop: 12, backgroundColor: 'rgba(255,255,255,0.05)', paddingVertical: 6, paddingHorizontal: 16, borderRadius: 20, alignSelf: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  poweredByText: { fontSize: 13, color: colors.textSecondary },
-  antigravityText: { color: colors.amber, fontWeight: 'bold' },
+  hero: { alignItems: 'center', paddingTop: 36, paddingBottom: 12, paddingHorizontal: spacing.xl },
+  title: { fontSize: 34, fontWeight: '800', color: '#10B981', letterSpacing: -0.8 },
+  tagline: { fontSize: 15, color: 'rgba(148,163,184,0.9)', marginTop: 10, textAlign: 'center', lineHeight: 23 },
+  poweredByRow: { marginTop: 14, backgroundColor: 'rgba(16,185,129,0.06)', paddingVertical: 7, paddingHorizontal: 18, borderRadius: 24, alignSelf: 'center', borderWidth: 1, borderColor: 'rgba(16,185,129,0.15)' },
+  poweredByText: { fontSize: 12, color: 'rgba(148,163,184,0.8)' },
+  antigravityText: { color: '#F59E0B', fontWeight: '700' },
 
   // Wave hero visual
-  heroWave: { marginHorizontal: spacing.xl, marginBottom: spacing.lg, borderRadius: radius.xl, overflow: 'hidden' },
-  waveGradient: { height: 100, backgroundColor: colors.surfaceContainer, justifyContent: 'center', alignItems: 'center', borderRadius: radius.xl },
-  waveEmoji: { fontSize: 28, letterSpacing: 12 },
+  heroWave: { marginHorizontal: spacing.xl, marginBottom: spacing.xl, borderRadius: 20, overflow: 'hidden' },
+  waveGradient: { height: 80, backgroundColor: 'rgba(16,185,129,0.04)', justifyContent: 'center', alignItems: 'center', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(16,185,129,0.08)' },
+  waveEmoji: { fontSize: 24, letterSpacing: 16, opacity: 0.7 },
 
   // Badges
-  badgeRow: { flexDirection: 'row', justifyContent: 'center', gap: spacing.sm, marginBottom: spacing.sm, paddingHorizontal: spacing.xl },
+  badgeRow: { flexDirection: 'row', justifyContent: 'center', gap: spacing.sm, marginBottom: spacing.sm + 2, paddingHorizontal: spacing.xl },
 
   // CTA
-  ctaSection: { paddingHorizontal: spacing.xl, marginTop: spacing.lg, marginBottom: spacing.xxl },
+  ctaSection: { paddingHorizontal: spacing.xl, marginTop: spacing.xl, marginBottom: spacing.xxl },
 
   // Pipeline loading
-  pipeRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, gap: spacing.md },
-  pipeIcon: { fontSize: 16, width: 24, textAlign: 'center' },
+  pipeRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, gap: spacing.md },
+  pipeIcon: { fontSize: 16, width: 28, textAlign: 'center' },
   pipeLbl: { fontSize: 14, color: colors.textMuted, fontWeight: '500' },
-  pipeLblActive: { color: colors.primary, fontWeight: '700' },
-  pipeLblDone: { color: colors.success },
+  pipeLblActive: { color: '#10B981', fontWeight: '700' },
+  pipeLblDone: { color: '#10B981' },
 
   // Demo input
-  demoTextBox: { backgroundColor: colors.surfaceContainer, padding: spacing.lg, borderRadius: radius.lg },
-  demoText: { fontSize: 15, color: colors.textPrimary, fontStyle: 'italic', lineHeight: 22 },
+  demoTextBox: { backgroundColor: 'rgba(255,255,255,0.03)', padding: spacing.lg, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  demoText: { fontSize: 15, color: colors.textPrimary, fontStyle: 'italic', lineHeight: 23 },
 
   // Notifications
-  notifRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
-  notifIcon: { fontSize: 24, marginTop: 2 },
+  notifRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md + 2 },
+  notifIcon: { fontSize: 26, marginTop: 2 },
   notifContent: { flex: 1 },
-  notifTitle: { fontSize: 15, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 },
-  notifText: { fontSize: 14, color: colors.textSecondary, lineHeight: 20 },
-  notifTime: { fontSize: 12, color: colors.textMuted, marginTop: 6 },
-  notifBtn: { marginTop: 12, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: colors.surfaceContainerHigh, borderRadius: radius.md, alignSelf: 'flex-start', borderWidth: 1, borderColor: colors.borderLight },
-  notifBtnText: { fontSize: 12, fontWeight: '700', color: colors.amber },
+  notifTitle: { fontSize: 16, fontWeight: '700', color: '#F1F5F9', marginBottom: 5 },
+  notifText: { fontSize: 14, color: 'rgba(148,163,184,0.85)', lineHeight: 21 },
+  notifTime: { fontSize: 11, color: 'rgba(100,116,139,0.7)', marginTop: 8, letterSpacing: 0.3 },
+  notifBtn: { marginTop: 14, paddingVertical: 10, paddingHorizontal: 16, backgroundColor: 'rgba(16,185,129,0.08)', borderRadius: 12, alignSelf: 'flex-start', borderWidth: 1, borderColor: 'rgba(16,185,129,0.2)' },
+  notifBtnText: { fontSize: 12, fontWeight: '700', color: '#10B981' },
 
   // Result header
-  resultHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.xl, marginBottom: spacing.md },
-  latency: { fontSize: 13, color: colors.textMuted, fontFamily: 'monospace' },
+  resultHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.xl, marginBottom: spacing.md + 4 },
+  latency: { fontSize: 12, color: 'rgba(100,116,139,0.6)', fontFamily: 'monospace', letterSpacing: 0.5 },
 
   // Steps
-  stepRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, gap: spacing.md },
-  stepDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.border },
-  stepDotDone: { backgroundColor: colors.success },
-  stepDotFail: { backgroundColor: colors.error },
-  stepLabel: { flex: 1, fontSize: 15, fontWeight: '500', color: colors.textPrimary },
-  stepLabelFail: { color: colors.error },
-  stepStatus: { fontSize: 14, fontWeight: '600', color: colors.textMuted },
+  stepRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, gap: spacing.md },
+  stepDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.1)' },
+  stepDotDone: { backgroundColor: '#10B981' },
+  stepDotFail: { backgroundColor: '#F43F5E' },
+  stepLabel: { flex: 1, fontSize: 15, fontWeight: '500', color: '#E2E8F0' },
+  stepLabelFail: { color: '#F43F5E' },
+  stepStatus: { fontSize: 14, fontWeight: '600', color: 'rgba(100,116,139,0.6)' },
 
   // Result cards
-  resultValue: { fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 },
+  resultValue: { fontSize: 22, fontWeight: '800', color: '#F1F5F9', marginBottom: 6, letterSpacing: -0.3 },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginTop: spacing.sm },
-  metaItem: { fontSize: 13, color: colors.textSecondary },
-  labelSuccess: { fontSize: 13, color: colors.success, marginTop: 6, fontWeight: '500' },
-  labelWarning: { fontSize: 13, color: colors.warning, marginTop: 6, fontWeight: '500' },
-  labelMuted: { fontSize: 13, color: colors.textMuted, marginTop: 6, fontStyle: 'italic' },
+  metaItem: { fontSize: 13, color: 'rgba(148,163,184,0.8)' },
+  labelSuccess: { fontSize: 13, color: '#10B981', marginTop: 8, fontWeight: '600' },
+  labelWarning: { fontSize: 13, color: '#F59E0B', marginTop: 8, fontWeight: '600' },
+  labelMuted: { fontSize: 13, color: 'rgba(100,116,139,0.6)', marginTop: 8, fontStyle: 'italic' },
 
   // Price
-  priceValue: { fontSize: 24, fontWeight: '700', color: colors.primary, marginBottom: 2 },
-  priceRange: { fontSize: 14, color: colors.textSecondary },
+  priceValue: { fontSize: 26, fontWeight: '800', color: '#10B981', marginBottom: 2, letterSpacing: -0.5 },
+  priceRange: { fontSize: 14, color: 'rgba(148,163,184,0.7)' },
 
   // Action grid
-  actGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.xl - 4, gap: spacing.sm, marginBottom: spacing.lg },
-  actBtn: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: radius.lg, minWidth: 100, alignItems: 'center' },
-  actBtnText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
+  actGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.xl - 4, gap: spacing.sm + 2, marginBottom: spacing.xl },
+  actBtn: { paddingHorizontal: 18, paddingVertical: 13, borderRadius: 14, minWidth: 105, alignItems: 'center' },
+  actBtnText: { fontSize: 13, fontWeight: '700', color: '#FFFFFF', letterSpacing: 0.2 },
 
   // Workflow preview
-  previewNote: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, marginTop: spacing.md, paddingTop: spacing.md, borderTopWidth: 1, borderTopColor: colors.borderLight },
+  previewNote: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, marginTop: spacing.md, paddingTop: spacing.md, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
   previewIcon: { fontSize: 18, marginTop: 2 },
-  previewText: { fontSize: 14, color: colors.textSecondary, lineHeight: 22, flex: 1 },
+  previewText: { fontSize: 14, color: 'rgba(148,163,184,0.8)', lineHeight: 22, flex: 1 },
 
   // Section label
-  sectionLabel: { ...typography.labelSm, marginHorizontal: spacing.xl, marginTop: spacing.xxl, marginBottom: spacing.md },
+  sectionLabel: { ...typography.labelSm, marginHorizontal: spacing.xl, marginTop: spacing.xxxl, marginBottom: spacing.md, letterSpacing: 1.5, fontSize: 11 },
 
   // Nav grid
-  navGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.xl - 4, gap: spacing.sm },
-  navCard: { width: '22%' as any, minWidth: 72, backgroundColor: colors.surface, paddingVertical: 12, borderRadius: radius.xl, alignItems: 'center', borderWidth: 1, borderColor: colors.borderLight, ...shadows.card },
-  navIconCircle: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
+  navGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.xl - 4, gap: spacing.sm + 2 },
+  navCard: { width: '22%' as any, minWidth: 72, backgroundColor: 'rgba(255,255,255,0.04)', paddingVertical: 14, borderRadius: 18, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', ...shadows.card },
+  navIconCircle: { width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
   navIcon: { fontSize: 20 },
-  navLabel: { fontSize: 11, fontWeight: '600', color: colors.textPrimary, textAlign: 'center' },
+  navLabel: { fontSize: 11, fontWeight: '600', color: '#E2E8F0', textAlign: 'center' },
 });

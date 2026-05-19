@@ -57,6 +57,10 @@ export const colors = {
   // Score bars
   scoreTrack: 'rgba(255,255,255,0.06)',
   scoreFill: '#06B6D4',
+
+  // Accent
+  amber: '#F59E0B',
+  amberLight: 'rgba(245,158,11,0.12)',
 } as const;
 
 export const typography = {
@@ -135,15 +139,22 @@ export const radius = {
 export const shadows = {
   card: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 3,
   },
   cardHover: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 6,
+  },
+  glow: {
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.25,
     shadowRadius: 20,
     elevation: 4,
   },

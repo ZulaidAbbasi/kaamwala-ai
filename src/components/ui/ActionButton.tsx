@@ -64,8 +64,8 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    height: 56,
-    borderRadius: radius.xl,
+    height: 58,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: spacing.xxl,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: '700',
     letterSpacing: -0.2,
   },
   disabled: {
