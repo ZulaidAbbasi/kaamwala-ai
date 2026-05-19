@@ -1,7 +1,7 @@
 // src/screens/ServiceRequestEntryScreen.tsx
 // Premium dark-mode service request entry
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -31,7 +31,7 @@ const EXAMPLE_REQUESTS = [
 type LocationSource = 'Request Text' | 'Phone GPS' | 'Manual';
 
 export default function ServiceRequestEntryScreen({ navigation }: { navigation: any }) {
-  const [text, setText] = useState(DEFAULT_REQUEST);
+  const [text, setText] = useState('');
   const [lang, setLang] = useState('Roman Urdu');
   const [locationSource, setLocationSource] = useState<LocationSource>('Request Text');
   const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -39,19 +39,25 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [locationDenied, setLocationDenied] = useState(false);
 
-  const langs = ['Urdu', 'Roman Urdu', 'English', 'Mixed'];
+  // Auto-request location on screen mount
+  useEffect(() => {
+    autoDetectLocation();
+  }, []);
 
-  async function handleUseLocation() {
+  async function autoDetectLocation() {
     setGpsLoading(true);
     setGpsError(null);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setGpsError('Location permission denied. Please enter your area manually.');
+        setLocationDenied(true);
+        setGpsError('Location permission denied. Tap below to try again or enter your area in the request.');
         setGpsLoading(false);
         return;
       }
+      setLocationDenied(false);
       const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const coords = { lat: loc.coords.latitude, lng: loc.coords.longitude };
       setGpsCoords(coords);
@@ -69,9 +75,15 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
         setGpsArea(`${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`);
       }
     } catch {
-      setGpsError('Could not detect location. Please enter area manually.');
+      setGpsError('Could not detect location. Please enter area manually in your request.');
     }
     setGpsLoading(false);
+  }
+
+  const langs = ['Urdu', 'Roman Urdu', 'English', 'Mixed'];
+
+  async function handleUseLocation() {
+    await autoDetectLocation();
   }
 
   function handleContinue() {

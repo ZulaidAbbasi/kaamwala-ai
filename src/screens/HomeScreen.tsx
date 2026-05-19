@@ -5,11 +5,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  ActivityIndicator, Animated,
+  ActivityIndicator, Animated, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DEMO_REQUEST } from '../config/constants';
 import { runFullWorkflow, WorkflowResult } from '../services/backend/orchestratorClient';
+import * as Location from 'expo-location';
 import {
   colors, spacing, radius, shadows, typography,
   StatusBadge, SectionCard, ActionButton, ProgressStepper,
@@ -61,6 +62,17 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
     }
   }, [loading]);
 
+  // Request location permission on app open
+  useEffect(() => {
+    (async () => {
+      try {
+        await Location.requestForegroundPermissionsAsync();
+      } catch {
+        // silent — will re-ask on ServiceRequestEntry
+      }
+    })();
+  }, []);
+
   const [activeBooking, setActiveBooking] = useState<any>(null);
 
   React.useEffect(() => {
@@ -103,6 +115,9 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           <Text style={s.tagline}>
             Agentic Service Orchestrator for{'\n'}Pakistan's Informal Economy
           </Text>
+          <View style={s.poweredByRow}>
+            <Text style={s.poweredByText}>Powered by <Text style={s.antigravityText}>Google Antigravity</Text></Text>
+          </View>
         </View>
 
         {/* ── Hero visual wave ── */}
@@ -173,17 +188,18 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
         {/* ── Primary CTA ── */}
         <View style={s.ctaSection}>
           <ActionButton
-            label="Run Full Agentic Workflow"
+            label="Start Service Request"
             icon="▶"
-            onPress={handleRun}
-            loading={loading}
+            onPress={() => navigation.navigate('ServiceRequestEntry')}
+            loading={false}
             variant="primary"
           />
           <View style={{ height: spacing.md }} />
           <ActionButton
-            label="Step-by-Step Demo"
-            icon="↓"
-            onPress={() => navigation.navigate('ServiceRequest', { prefillText: DEMO_REQUEST })}
+            label="Run Full Agentic Workflow"
+            icon="⚡"
+            onPress={handleRun}
+            loading={loading}
             variant="secondary"
           />
         </View>
@@ -208,12 +224,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
           </SectionCard>
         )}
 
-        {/* ── Demo input preview ── */}
-        <SectionCard title="Demo Request" subtitle="Roman Urdu • Multilingual Input">
-          <View style={s.demoTextBox}>
-            <Text style={s.demoText}>"{DEMO_REQUEST}"</Text>
-          </View>
-        </SectionCard>
+
 
         {/* ── Error ── */}
         {error !== '' && (
@@ -385,6 +396,9 @@ const s = StyleSheet.create({
   hero: { alignItems: 'center', paddingTop: 28, paddingBottom: 8, paddingHorizontal: spacing.xl },
   title: { fontSize: 30, fontWeight: '700', color: colors.primaryDark, letterSpacing: -0.5 },
   tagline: { fontSize: 15, color: colors.textSecondary, marginTop: 8, textAlign: 'center', lineHeight: 22 },
+  poweredByRow: { marginTop: 12, backgroundColor: 'rgba(255,255,255,0.05)', paddingVertical: 6, paddingHorizontal: 16, borderRadius: 20, alignSelf: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  poweredByText: { fontSize: 13, color: colors.textSecondary },
+  antigravityText: { color: colors.amber, fontWeight: 'bold' },
 
   // Wave hero visual
   heroWave: { marginHorizontal: spacing.xl, marginBottom: spacing.lg, borderRadius: radius.xl, overflow: 'hidden' },
