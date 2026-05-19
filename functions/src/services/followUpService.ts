@@ -313,21 +313,17 @@ export async function simulateFollowUp(input: {
       createdAt: Timestamp.now(),
     });
 
-    // Update booking status
-    batch.update(db.collection('bookings').doc(bookingId), {
-      status: 'completed',
-      updatedAt: Timestamp.now(),
-    });
-
-    // Save booking event
-    batch.set(db.collection('booking_events').doc(`evt_${bookingId}_completed`), {
+    // Save follow-up simulation log (does NOT change booking status)
+    // The booking stays as 'pending_provider_confirmation' so providers
+    // can Accept/Reject from the Provider Dashboard
+    batch.set(db.collection('booking_events').doc(`evt_${bookingId}_followup_sim`), {
       bookingId,
       workflowId,
-      eventType: 'booking_completed',
-      description: `Service completed. Rating: ${feedback.rating}/5. Provider: ${providerName}.`,
-      oldStatus: 'pending_provider_confirmation',
-      newStatus: 'completed',
-      actor: 'system_simulation',
+      eventType: 'followup_simulation_completed',
+      description: `Follow-up simulation completed. Rating: ${feedback.rating}/5. Provider: ${providerName}. Booking status preserved for Provider Dashboard.`,
+      simulatedStatus: 'completed',
+      actualStatus: 'pending_provider_confirmation',
+      actor: 'followup_agent_simulation',
       createdAt: Timestamp.now(),
     });
 
