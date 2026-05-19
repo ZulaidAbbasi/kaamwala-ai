@@ -210,19 +210,7 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
               ? badge('Internal Booking', C.deepGreen, '#D1FAE5')
               : badge('Google Places Data', C.teal, C.tealBg)}
           </View>
-          {/* Book button — primary CTA */}
-          <TouchableOpacity
-            style={s.bookBtn}
-            onPress={() => handleBookProvider(sel)}
-            activeOpacity={0.8}
-            disabled={bookingProvider === sel.name}
-          >
-            {bookingProvider === sel.name ? (
-              <ActivityIndicator size="small" color="#FFF" />
-            ) : (
-              <Text style={s.bookBtnText}>📋 Book This Provider</Text>
-            )}
-          </TouchableOpacity>
+
           {/* Action buttons */}
           <View style={s.actionRow}>
             {sel.googleMapsUri ? actionBtn('🗺 Open in Maps', C.teal, C.tealBg, () => openLink(sel.googleMapsUri, 'Could not open Google Maps.')) : null}
@@ -260,18 +248,7 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
               </TouchableOpacity>
               {expandedOther === i && <>
                 {providerDetailView(c)}
-                <TouchableOpacity
-                  style={[s.bookBtn, { marginTop: 10, marginBottom: 6 }]}
-                  onPress={() => handleBookProvider(c)}
-                  activeOpacity={0.8}
-                  disabled={bookingProvider === c.name}
-                >
-                  {bookingProvider === c.name ? (
-                    <ActivityIndicator size="small" color="#FFF" />
-                  ) : (
-                    <Text style={s.bookBtnText}>📋 Book {safe(c.name, 'This Provider').substring(0, 20)}</Text>
-                  )}
-                </TouchableOpacity>
+
               </>}
             </View>
             );
