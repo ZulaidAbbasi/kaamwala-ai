@@ -215,65 +215,65 @@ export default function PitchHomeScreen({ navigation }: { navigation: any }) {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.bgDark },
+  root: { flex: 1, backgroundColor: '#060912' },
   safe: { flex: 1 },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: 20, paddingTop: 20 },
+  content: { paddingHorizontal: 20, paddingTop: 20, maxWidth: 680, alignSelf: 'center' as const, width: '100%' as any },
 
   // Hero
-  heroSection: { alignItems: 'center', paddingTop: 24, paddingBottom: 8, position: 'relative' },
-  heroGlow: { position: 'absolute', top: -30, left: -60, right: -60, height: 180, borderRadius: 100 },
-  heroTitle: { fontSize: 44, fontWeight: '900', color: C.text, letterSpacing: -2, textAlign: 'center' },
-  heroSubtitle: { fontSize: 16, fontWeight: '500', color: C.textSecondary, textAlign: 'center', marginTop: 4, letterSpacing: 0.5 },
-  heroBadge: { marginTop: 14, borderRadius: 24, overflow: 'hidden' },
-  heroBadgeGrad: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 24 },
-  heroBadgeText: { fontSize: 13, fontWeight: '700', color: '#D1FAE5', letterSpacing: 0.3 },
+  heroSection: { alignItems: 'center', paddingTop: 32, paddingBottom: 12, position: 'relative' },
+  heroGlow: { position: 'absolute', top: -50, left: -80, right: -80, height: 220, borderRadius: 120 },
+  heroTitle: { fontSize: 48, fontWeight: '900', color: '#F8FAFC', letterSpacing: -2.5, textAlign: 'center' },
+  heroSubtitle: { fontSize: 17, fontWeight: '500', color: 'rgba(148,163,184,0.9)', textAlign: 'center', marginTop: 6, letterSpacing: 1 },
+  heroBadge: { marginTop: 16, borderRadius: 28, overflow: 'hidden' },
+  heroBadgeGrad: { paddingHorizontal: 22, paddingVertical: 10, borderRadius: 28 },
+  heroBadgeText: { fontSize: 13, fontWeight: '700', color: '#D1FAE5', letterSpacing: 0.4 },
 
   // Tagline
-  taglineCard: { flexDirection: 'row', backgroundColor: C.surface, borderRadius: 16, padding: 18, marginTop: 20, borderWidth: 1, borderColor: C.border },
-  taglineAccent: { width: 4, backgroundColor: C.emerald, borderRadius: 2, marginRight: 14 },
-  taglineText: { flex: 1, fontSize: 14, color: C.textSecondary, lineHeight: 22 },
+  taglineCard: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 18, padding: 20, marginTop: 24, borderWidth: 1, borderColor: 'rgba(16,185,129,0.12)' },
+  taglineAccent: { width: 3, backgroundColor: '#10B981', borderRadius: 2, marginRight: 16 },
+  taglineText: { flex: 1, fontSize: 14, color: 'rgba(148,163,184,0.85)', lineHeight: 23 },
 
   // Status
-  statusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 20, justifyContent: 'center' },
-  statusChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, gap: 7, borderWidth: 1, borderColor: C.border },
+  statusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 24, justifyContent: 'center' },
+  statusChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 24, gap: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusLabel: { fontSize: 12, fontWeight: '700', letterSpacing: 0.3 },
+  statusLabel: { fontSize: 12, fontWeight: '700', letterSpacing: 0.4 },
 
   // Primary CTA
-  primaryBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20, borderRadius: 16, marginTop: 20, gap: 10, shadowColor: C.emerald, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 16, elevation: 12 },
-  primaryBtnIcon: { fontSize: 20 },
-  primaryBtnText: { color: '#FFFFFF', fontSize: 19, fontWeight: '800', letterSpacing: 0.3 },
+  primaryBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 22, borderRadius: 18, marginTop: 24, gap: 12, shadowColor: '#10B981', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.4, shadowRadius: 20, elevation: 14 },
+  primaryBtnIcon: { fontSize: 22 },
+  primaryBtnText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800', letterSpacing: 0.3 },
 
   // Secondary CTA
-  secondaryBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 18, borderRadius: 16, marginTop: 10, borderWidth: 1.5, borderColor: C.borderAccent, backgroundColor: C.emeraldGlow, gap: 10 },
-  secondaryBtnIcon: { fontSize: 14, color: C.emerald },
-  secondaryBtnText: { color: C.emerald, fontSize: 16, fontWeight: '700' },
+  secondaryBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 18, borderRadius: 18, marginTop: 12, borderWidth: 1.5, borderColor: 'rgba(16,185,129,0.25)', backgroundColor: 'rgba(16,185,129,0.06)', gap: 10 },
+  secondaryBtnIcon: { fontSize: 14, color: '#10B981' },
+  secondaryBtnText: { color: '#10B981', fontSize: 16, fontWeight: '700' },
 
   // Pipeline
-  pipelineCard: { backgroundColor: C.surface, borderRadius: 20, padding: 20, marginTop: 28, borderWidth: 1, borderColor: C.border },
-  sectionTitle: { fontSize: 18, fontWeight: '800', color: C.text, letterSpacing: -0.3 },
-  sectionSubtitle: { fontSize: 13, color: C.muted, marginTop: 2, marginBottom: 16 },
-  pipelineScroll: { marginHorizontal: -20 },
-  pipelineContent: { paddingHorizontal: 20, flexDirection: 'row', alignItems: 'flex-start', gap: 20 },
-  pipelineItem: { alignItems: 'center', position: 'relative', width: 46 },
-  pipelineCircle: { width: 36, height: 36, borderRadius: 18, borderWidth: 2, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.04)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.4, shadowRadius: 6 },
-  pipelineIcon: { fontSize: 15 },
-  pipelineLabel: { fontSize: 8, fontWeight: '600', color: C.muted, marginTop: 4, textAlign: 'center', width: 50 },
-  pipelineConnector: { position: 'absolute', top: 17, left: 23, width: 66, height: 2, zIndex: -1 },
-  pipelineConnectorGrad: { flex: 1, height: 2, borderRadius: 1, opacity: 0.5 },
+  pipelineCard: { backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 22, padding: 22, marginTop: 32, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  sectionTitle: { fontSize: 19, fontWeight: '800', color: '#F1F5F9', letterSpacing: -0.3 },
+  sectionSubtitle: { fontSize: 13, color: 'rgba(100,116,139,0.7)', marginTop: 3, marginBottom: 18 },
+  pipelineScroll: { marginHorizontal: -22 },
+  pipelineContent: { paddingHorizontal: 22, flexDirection: 'row', alignItems: 'flex-start', gap: 22 },
+  pipelineItem: { alignItems: 'center', position: 'relative', width: 50 },
+  pipelineCircle: { width: 42, height: 42, borderRadius: 21, borderWidth: 2, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.04)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 10 },
+  pipelineIcon: { fontSize: 17 },
+  pipelineLabel: { fontSize: 9, fontWeight: '700', color: 'rgba(100,116,139,0.7)', marginTop: 6, textAlign: 'center', width: 54, letterSpacing: 0.3 },
+  pipelineConnector: { position: 'absolute', top: 20, left: 26, width: 68, height: 2, zIndex: -1 },
+  pipelineConnectorGrad: { flex: 1, height: 2, borderRadius: 1, opacity: 0.4 },
 
   // Quick actions
-  actionsGrid: { gap: 8, marginTop: 12, marginBottom: 16 },
-  actionCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.surface, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 16, borderWidth: 1, borderColor: C.border, gap: 12 },
-  actionIconWrap: { width: 38, height: 38, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  actionIcon: { fontSize: 18 },
-  actionLabel: { flex: 1, fontSize: 15, fontWeight: '600', color: C.text },
+  actionsGrid: { gap: 10, marginTop: 14, marginBottom: 20 },
+  actionCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 16, paddingVertical: 16, paddingHorizontal: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', gap: 14 },
+  actionIconWrap: { width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  actionIcon: { fontSize: 19 },
+  actionLabel: { flex: 1, fontSize: 15, fontWeight: '600', color: '#E2E8F0' },
   actionArrow: { fontSize: 18, fontWeight: '700' },
 
   // Footer
-  footer: { alignItems: 'center', paddingVertical: 24, position: 'relative' },
+  footer: { alignItems: 'center', paddingVertical: 28, position: 'relative' },
   footerGlow: { position: 'absolute', top: 0, left: -40, right: -40, height: 80, borderRadius: 40 },
-  footerText: { fontSize: 14, fontWeight: '800', color: C.emerald, letterSpacing: 0.5 },
-  footerSub: { fontSize: 11, color: C.muted, marginTop: 4, textAlign: 'center' },
+  footerText: { fontSize: 15, fontWeight: '800', color: '#10B981', letterSpacing: 0.8 },
+  footerSub: { fontSize: 11, color: 'rgba(100,116,139,0.6)', marginTop: 5, textAlign: 'center' },
 });
