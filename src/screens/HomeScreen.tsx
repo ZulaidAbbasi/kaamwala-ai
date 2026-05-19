@@ -61,6 +61,29 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
     }
   }, [loading]);
 
+  const [activeBooking, setActiveBooking] = useState<any>(null);
+
+  React.useEffect(() => {
+    const fetchLatestBooking = async () => {
+      try {
+        const url = 'https://us-central1-kaamwala-ai.cloudfunctions.net/api/bookings';
+        const r = await fetch(url);
+        const data = await r.json();
+        if (data.success && data.bookings && data.bookings.length > 0) {
+          setActiveBooking(data.bookings[0]);
+        }
+      } catch (err) {
+        // silent fail
+      }
+    };
+    
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchLatestBooking();
+    });
+    fetchLatestBooking();
+    return unsubscribe;
+  }, [navigation]);
+
   const handleRun = async () => {
     setLoading(true); setResult(null); setError('');
     try {
@@ -101,14 +124,26 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
 
         {/* ── Notifications ── */}
         <SectionCard title="🔔 Notifications & Follow-Ups" accent="amber">
-          {result?.bookingResult ? (
-            result.bookingResult.status === 'completed' ? (
+          {activeBooking ? (
+            activeBooking.status === 'completed' ? (
               <View style={s.notifRow}>
                 <Text style={s.notifIcon}>⭐</Text>
                 <View style={s.notifContent}>
-                  <Text style={s.notifTitle}>Job Completed & Rated</Text>
-                  <Text style={s.notifText}>Your {result.parsedRequest?.serviceType || 'service'} with {result.selectedProvider?.name} was completed. Thank you for your 4.5/5 rating!</Text>
-                  <Text style={s.notifTime}>Just now</Text>
+                  <Text style={s.notifTitle}>Job Completed</Text>
+                  <Text style={s.notifText}>Your {activeBooking.serviceType} with {activeBooking.providerName} was completed successfully!</Text>
+                  <Text style={s.notifTime}>{new Date(activeBooking.createdAt?._seconds ? activeBooking.createdAt._seconds * 1000 : Date.now()).toLocaleTimeString()} • Simulated</Text>
+                </View>
+              </View>
+            ) : activeBooking.status === 'confirmed' ? (
+               <View style={s.notifRow}>
+                <Text style={s.notifIcon}>🚗</Text>
+                <View style={s.notifContent}>
+                  <Text style={s.notifTitle}>Provider En Route</Text>
+                  <Text style={s.notifText}>{activeBooking.providerName} accepted your request and is en route for your {activeBooking.serviceType}.</Text>
+                  <Text style={s.notifTime}>Provider Accepted • Scheduled</Text>
+                  <TouchableOpacity style={s.notifBtn} onPress={() => navigation.navigate('ProviderAdmin')}>
+                    <Text style={s.notifBtnText}>Complete Job in Dashboard →</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ) : (
@@ -116,8 +151,8 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 <Text style={s.notifIcon}>⏳</Text>
                 <View style={s.notifContent}>
                   <Text style={s.notifTitle}>Awaiting Provider Confirmation</Text>
-                  <Text style={s.notifText}>Your {result.parsedRequest?.serviceType || 'service'} booking is sent to {result.selectedProvider?.name}. Follow-up timeline is scheduled.</Text>
-                  <Text style={s.notifTime}>Just now</Text>
+                  <Text style={s.notifText}>Your {activeBooking.serviceType} booking is sent to {activeBooking.providerName}.</Text>
+                  <Text style={s.notifTime}>Pending</Text>
                   <TouchableOpacity style={s.notifBtn} onPress={() => navigation.navigate('ProviderAdmin')}>
                     <Text style={s.notifBtnText}>Open Provider Dashboard to Accept →</Text>
                   </TouchableOpacity>
