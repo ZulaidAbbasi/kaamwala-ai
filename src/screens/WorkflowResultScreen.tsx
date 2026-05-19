@@ -3,7 +3,7 @@
 // Sections: Request Summary · Recommended Provider · Reasoning · Booking · Follow-up · Agent Workflow · Other Options
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Alert, ActivityIndicator, Dimensions, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { WorkflowResult } from '../services/workflow/runServiceWorkflow';
@@ -31,6 +31,8 @@ function openLink(url: string, errorMsg: string) {
 }
 
 export default function WorkflowResultScreen({ navigation, route }: { navigation: any; route: any }) {
+  const { width: screenWidth } = useWindowDimensions();
+  const isMobile = screenWidth < 600;
   const r: WorkflowResult = route?.params?.result || {};
   const rawText: string = route?.params?.rawText || '';
   const p = r.parsed;
@@ -79,16 +81,16 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
   );
 
   const row = (label: string, value: string) => (
-    <View style={s.row}>
-      <Text style={s.rowLabel}>{label}</Text>
-      <Text style={s.rowValue}>{value}</Text>
+    <View style={[s.row, isMobile && s.rowMobile]}>
+      <Text style={[s.rowLabel, isMobile && s.rowLabelMobile]}>{label}</Text>
+      <Text style={[s.rowValue, isMobile && s.rowValueMobile]}>{value}</Text>
     </View>
   );
 
   const sectionCard = (title: string, accent: string, children: React.ReactNode) => (
-    <View style={[s.card, { borderLeftColor: accent }]}>
+    <View style={[s.card, isMobile && s.cardMobile, { borderLeftColor: accent }]}>
       <View style={[s.cardGlow, { backgroundColor: `${accent}08` }]} />
-      <Text style={s.cardTitle}>{title}</Text>
+      <Text style={[s.cardTitle, isMobile && s.cardTitleMobile]}>{title}</Text>
       {children}
     </View>
   );
@@ -153,7 +155,7 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
     <View style={s.root}>
     <LinearGradient colors={['#0B0F1A', '#111827', '#0B0F1A']} style={StyleSheet.absoluteFill} />
     <SafeAreaView style={s.safe} edges={['bottom']}>
-      <ScrollView style={s.scroll} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={s.scroll} contentContainerStyle={[s.content, isMobile && s.contentMobile]} showsVerticalScrollIndicator={false}>
 
         {/* ═══════════════════════════════════════════════════════════════
             SECTION 1 — Service Request
@@ -284,10 +286,10 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
           {sel && (sel.factors || []).length > 0 && <>
             <View style={{ marginTop: 10 }}>
               {(sel.factors || []).slice(0, 4).map((f: any, i: number) => (
-                <View key={i} style={s.factorRow}>
-                  <Text style={s.factorLabel}>{safe(f.factor, ['Service Match', 'Distance', 'Rating', 'Data'][i])}</Text>
-                  <View style={s.barBg}><View style={[s.barFill, { width: `${Math.round((f.normalizedScore || 0) * 100)}%` }]} /></View>
-                  <Text style={s.factorVal}>{Math.round((f.normalizedScore || 0) * 100)}%</Text>
+                <View key={i} style={[s.factorRow, isMobile && s.factorRowMobile]}>
+                  <Text style={[s.factorLabel, isMobile && s.factorLabelMobile]}>{safe(f.factor, ['Service Match', 'Distance', 'Rating', 'Data'][i])}</Text>
+                  <View style={[s.barBg, isMobile && s.barBgMobile]}><View style={[s.barFill, { width: `${Math.round((f.normalizedScore || 0) * 100)}%` }]} /></View>
+                  <Text style={[s.factorVal, isMobile && s.factorValMobile]}>{Math.round((f.normalizedScore || 0) * 100)}%</Text>
                 </View>
               ))}
             </View>
@@ -306,9 +308,9 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
             <View style={{ marginTop: 8 }}>
               <Text style={[s.rowLabel, { fontWeight: '700', marginBottom: 4 }]}>Pricing Factors</Text>
               {pr.breakdown.slice(0, 5).map((item: any, i: number) => (
-                <View key={i} style={s.factorRow}>
-                  <Text style={s.factorLabel}>{safe(item.label || item.factor, `Factor ${i+1}`)}</Text>
-                  <Text style={s.factorVal}>{item.amount != null ? `PKR ${item.amount}` : safe(item.impact || item.value, '—')}</Text>
+                <View key={i} style={[s.factorRow, isMobile && s.factorRowMobile]}>
+                  <Text style={[s.factorLabel, isMobile && s.factorLabelMobile]}>{safe(item.label || item.factor, `Factor ${i+1}`)}</Text>
+                  <Text style={[s.factorVal, isMobile && s.factorValMobile]}>{item.amount != null ? `PKR ${item.amount}` : safe(item.impact || item.value, '—')}</Text>
                 </View>
               ))}
             </View>
@@ -489,77 +491,87 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg },
   safe: { flex: 1 },
   scroll: { flex: 1 },
-  content: { padding: 16, paddingTop: 8 },
+  content: { padding: 16, paddingTop: 8, maxWidth: 960, alignSelf: 'center' as const, width: '100%' as any },
+  contentMobile: { padding: 12, paddingTop: 6 },
 
   // Card
   card: { backgroundColor: C.surface, borderRadius: 18, padding: 20, marginVertical: 8, borderLeftWidth: 4, borderWidth: 1, borderColor: C.border, borderTopColor: C.border, borderRightColor: C.border, borderBottomColor: C.border, overflow: 'hidden', position: 'relative' as const },
+  cardMobile: { padding: 14, borderRadius: 14, marginVertical: 6 },
   cardGlow: { position: 'absolute' as const, top: 0, left: 0, right: 0, height: 60, borderRadius: 18 },
   cardTitle: { fontSize: 19, fontWeight: '800', color: C.text, marginBottom: 14, letterSpacing: -0.3 },
+  cardTitleMobile: { fontSize: 16, marginBottom: 10 },
 
-  // Rows
-  row: { flexDirection: 'row' as const, justifyContent: 'space-between' as const, paddingVertical: 6, minHeight: 30 },
+  // Rows — desktop: side-by-side, mobile: stacked
+  row: { flexDirection: 'row' as const, justifyContent: 'space-between' as const, paddingVertical: 6, minHeight: 30, alignItems: 'flex-start' as const },
+  rowMobile: { flexDirection: 'column' as const, paddingVertical: 4, minHeight: 0, gap: 2 },
   rowLabel: { fontSize: 14, color: C.muted, flex: 1 },
+  rowLabelMobile: { fontSize: 12, flex: undefined as any, marginBottom: 1 },
   rowValue: { fontSize: 14, fontWeight: '600', color: C.text, flex: 1.2, textAlign: 'right' as const },
+  rowValueMobile: { fontSize: 13, flex: undefined as any, textAlign: 'left' as const },
 
   // Badges
   badgeRow: { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: 6, marginTop: 12 },
-  badge: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 16, borderWidth: 1, borderColor: C.border },
-  badgeText: { fontSize: 11, fontWeight: '700' },
+  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 16, borderWidth: 1, borderColor: C.border },
+  badgeText: { fontSize: 10, fontWeight: '700' },
 
   // Recommended Provider
   mainProviderRow: { flexDirection: 'row' as const, alignItems: 'center' as const, paddingVertical: 8, marginBottom: 10 },
-  avatarLg: { width: 48, height: 48, borderRadius: 24, backgroundColor: C.greenBg, alignItems: 'center' as const, justifyContent: 'center' as const, borderWidth: 2, borderColor: 'rgba(16,185,129,0.3)' },
-  avatarLgText: { fontSize: 20, fontWeight: '800', color: C.green },
-  mainProviderName: { fontSize: 18, fontWeight: '800', color: C.text },
-  providerMeta: { fontSize: 12, color: C.muted, marginTop: 2 },
-  expandArrow: { fontSize: 14, color: C.muted, paddingHorizontal: 8 },
+  avatarLg: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.greenBg, alignItems: 'center' as const, justifyContent: 'center' as const, borderWidth: 2, borderColor: 'rgba(16,185,129,0.3)' },
+  avatarLgText: { fontSize: 18, fontWeight: '800', color: C.green },
+  mainProviderName: { fontSize: 17, fontWeight: '800', color: C.text },
+  providerMeta: { fontSize: 11, color: C.muted, marginTop: 2 },
+  expandArrow: { fontSize: 14, color: C.muted, paddingHorizontal: 6 },
 
   // Action buttons
   actionRow: { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: 8, marginTop: 14 },
-  actionBtn: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, minHeight: 46, justifyContent: 'center' as const, borderWidth: 1, borderColor: C.border },
-  actionBtnText: { fontSize: 14, fontWeight: '700' },
+  actionBtn: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12, minHeight: 42, justifyContent: 'center' as const, borderWidth: 1, borderColor: C.border },
+  actionBtnText: { fontSize: 13, fontWeight: '700' },
 
   // Book button
-  bookBtn: { marginTop: 16, paddingVertical: 16, borderRadius: 14, alignItems: 'center' as const, justifyContent: 'center' as const, backgroundColor: C.deepGreen, minHeight: 52, borderWidth: 1.5, borderColor: C.borderAccent, shadowColor: C.green, shadowOffset: { width: 0, height: 4 } as const, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
-  bookBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800', letterSpacing: 0.3 },
+  bookBtn: { marginTop: 14, paddingVertical: 14, borderRadius: 14, alignItems: 'center' as const, justifyContent: 'center' as const, backgroundColor: C.deepGreen, minHeight: 48, borderWidth: 1.5, borderColor: C.borderAccent, shadowColor: C.green, shadowOffset: { width: 0, height: 4 } as const, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
+  bookBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
 
   // Provider detail (expanded)
-  detailBox: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 14, marginTop: 12, borderWidth: 1, borderColor: C.border },
+  detailBox: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 12, marginTop: 10, borderWidth: 1, borderColor: C.border },
 
   // Other providers
-  avatar: { width: 38, height: 38, borderRadius: 19, backgroundColor: C.tealBg, alignItems: 'center' as const, justifyContent: 'center' as const, borderWidth: 1, borderColor: 'rgba(6,182,212,0.3)' },
-  avatarText: { fontSize: 15, fontWeight: '800', color: C.teal },
-  otherRow: { flexDirection: 'row' as const, alignItems: 'center' as const, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, gap: 12 },
-  otherName: { fontSize: 15, fontWeight: '700', color: C.text },
+  avatar: { width: 34, height: 34, borderRadius: 17, backgroundColor: C.tealBg, alignItems: 'center' as const, justifyContent: 'center' as const, borderWidth: 1, borderColor: 'rgba(6,182,212,0.3)' },
+  avatarText: { fontSize: 14, fontWeight: '800', color: C.teal },
+  otherRow: { flexDirection: 'row' as const, alignItems: 'center' as const, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: C.border, gap: 10 },
+  otherName: { fontSize: 14, fontWeight: '700', color: C.text },
 
   // Reasoning
-  reasoningText: { fontSize: 14, color: C.textSecondary, lineHeight: 22 },
-  noDataText: { fontSize: 14, color: C.muted, lineHeight: 22 },
+  reasoningText: { fontSize: 13, color: C.textSecondary, lineHeight: 20 },
+  noDataText: { fontSize: 13, color: C.muted, lineHeight: 20 },
 
-  // Ranking factors
+  // Ranking factors — responsive
   factorRow: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, marginVertical: 4 },
+  factorRowMobile: { gap: 6 },
   factorLabel: { fontSize: 13, color: C.muted, width: 100 },
+  factorLabelMobile: { fontSize: 11, width: 80 },
   barBg: { flex: 1, height: 8, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 4 },
+  barBgMobile: { height: 6 },
   barFill: { height: 8, backgroundColor: C.teal, borderRadius: 4 },
-  factorVal: { fontSize: 13, fontWeight: '600', color: C.text, width: 36, textAlign: 'right' as const },
+  factorVal: { fontSize: 13, fontWeight: '600', color: C.text, minWidth: 60, textAlign: 'right' as const },
+  factorValMobile: { fontSize: 12, minWidth: 50 },
 
   // Trace
-  traceStep: { flexDirection: 'row' as const, justifyContent: 'space-between' as const, alignItems: 'center' as const, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: C.border },
-  traceStepText: { fontSize: 14, color: C.text },
-  traceCheck: { fontSize: 14, fontWeight: '700', color: C.green },
-  traceBtn: { marginTop: 14, paddingVertical: 14, minHeight: 48, alignItems: 'center' as const, backgroundColor: C.purpleBg, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)' },
-  traceBtnText: { fontSize: 15, fontWeight: '700', color: C.purple },
+  traceStep: { flexDirection: 'row' as const, justifyContent: 'space-between' as const, alignItems: 'center' as const, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: C.border, gap: 8 },
+  traceStepText: { fontSize: 13, color: C.text, flex: 1 },
+  traceCheck: { fontSize: 13, fontWeight: '700', color: C.green },
+  traceBtn: { marginTop: 12, paddingVertical: 12, minHeight: 44, alignItems: 'center' as const, backgroundColor: C.purpleBg, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)' },
+  traceBtnText: { fontSize: 14, fontWeight: '700', color: C.purple },
 
   // Booking note
-  bookingNote: { fontSize: 12, color: C.muted, marginTop: 10, lineHeight: 18, fontStyle: 'italic' as const },
+  bookingNote: { fontSize: 11, color: C.muted, marginTop: 8, lineHeight: 17, fontStyle: 'italic' as const },
 
   // Navigation
-  newRequestBtn: { paddingVertical: 16, borderRadius: 16, alignItems: 'center' as const, marginTop: 16, borderWidth: 1.5, borderColor: C.borderAccent, backgroundColor: C.greenBg },
-  newRequestText: { color: C.green, fontSize: 16, fontWeight: '700' },
-  homeBtn: { paddingVertical: 16, borderRadius: 16, alignItems: 'center' as const, marginTop: 8, backgroundColor: C.deepGreen },
-  homeBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
+  newRequestBtn: { paddingVertical: 14, borderRadius: 16, alignItems: 'center' as const, marginTop: 14, borderWidth: 1.5, borderColor: C.borderAccent, backgroundColor: C.greenBg },
+  newRequestText: { color: C.green, fontSize: 15, fontWeight: '700' },
+  homeBtn: { paddingVertical: 14, borderRadius: 16, alignItems: 'center' as const, marginTop: 8, backgroundColor: C.deepGreen },
+  homeBtnText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
   navRow: { flexDirection: 'row' as const, gap: 8, marginTop: 8 },
-  navBtn: { flex: 1, minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface, alignItems: 'center' as const, justifyContent: 'center' as const },
-  navBtnText: { fontSize: 13, fontWeight: '700', color: C.text },
+  navBtn: { flex: 1, minHeight: 44, borderRadius: 14, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface, alignItems: 'center' as const, justifyContent: 'center' as const },
+  navBtnText: { fontSize: 12, fontWeight: '700', color: C.text },
 });
 

@@ -308,7 +308,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   scroll: { flex: 1 },
-  scrollContent: { paddingBottom: 20 },
+  scrollContent: { paddingBottom: 20, maxWidth: 960, alignSelf: 'center' as const, width: '100%' as any },
 
   // Hero
   hero: { alignItems: 'center', paddingTop: 28, paddingBottom: 8, paddingHorizontal: spacing.xl },
@@ -377,7 +377,7 @@ const s = StyleSheet.create({
 
   // Nav grid
   navGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.xl - 4, gap: spacing.sm },
-  navCard: { width: '23%', backgroundColor: colors.surface, paddingVertical: 14, borderRadius: radius.xl, alignItems: 'center', borderWidth: 1, borderColor: colors.borderLight, ...shadows.card },
+  navCard: { width: '22%' as any, minWidth: 72, backgroundColor: colors.surface, paddingVertical: 12, borderRadius: radius.xl, alignItems: 'center', borderWidth: 1, borderColor: colors.borderLight, ...shadows.card },
   navIconCircle: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
   navIcon: { fontSize: 20 },
   navLabel: { fontSize: 11, fontWeight: '600', color: colors.textPrimary, textAlign: 'center' },

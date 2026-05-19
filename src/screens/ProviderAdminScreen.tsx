@@ -3,7 +3,7 @@
 // Proves real booking lifecycle for hackathon judges
 
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, RefreshControl, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
@@ -58,6 +58,8 @@ const STATUS_COLORS: Record<string, { color: string; bg: string; label: string }
 };
 
 export default function ProviderAdminScreen({ navigation }: { navigation: any }) {
+  const { width: screenWidth } = useWindowDimensions();
+  const isMobile = screenWidth < 600;
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -131,15 +133,15 @@ export default function ProviderAdminScreen({ navigation }: { navigation: any })
         contentContainerStyle={s.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadBookings(); }} tintColor={C.green} />}
       >
-        <Text style={s.title}>🏢 Provider Dashboard</Text>
+        <Text style={[s.title, isMobile && s.titleMobile]}>🏢 Provider Dashboard</Text>
         <Text style={s.subtitle}>Manage bookings · Accept / Reject / Complete</Text>
 
         {/* Stats row */}
-        <View style={s.statsRow}>
-          <View style={[s.statBox, { backgroundColor: C.amberBg }]}><Text style={[s.statNum, { color: C.amber }]}>{pending.length}</Text><Text style={s.statLabel}>Pending</Text></View>
-          <View style={[s.statBox, { backgroundColor: C.greenBg }]}><Text style={[s.statNum, { color: C.green }]}>{confirmed.length}</Text><Text style={s.statLabel}>Confirmed</Text></View>
-          <View style={[s.statBox, { backgroundColor: C.tealBg }]}><Text style={[s.statNum, { color: C.teal }]}>{completed.length}</Text><Text style={s.statLabel}>Completed</Text></View>
-          <View style={[s.statBox, { backgroundColor: 'rgba(255,255,255,0.04)' }]}><Text style={[s.statNum, { color: C.muted }]}>{other.length}</Text><Text style={s.statLabel}>Other</Text></View>
+        <View style={[s.statsRow, isMobile && s.statsRowMobile]}>
+          <View style={[s.statBox, isMobile && s.statBoxMobile, { backgroundColor: C.amberBg }]}><Text style={[s.statNum, isMobile && s.statNumMobile, { color: C.amber }]}>{pending.length}</Text><Text style={s.statLabel}>Pending</Text></View>
+          <View style={[s.statBox, isMobile && s.statBoxMobile, { backgroundColor: C.greenBg }]}><Text style={[s.statNum, isMobile && s.statNumMobile, { color: C.green }]}>{confirmed.length}</Text><Text style={s.statLabel}>Confirmed</Text></View>
+          <View style={[s.statBox, isMobile && s.statBoxMobile, { backgroundColor: C.tealBg }]}><Text style={[s.statNum, isMobile && s.statNumMobile, { color: C.teal }]}>{completed.length}</Text><Text style={s.statLabel}>Completed</Text></View>
+          <View style={[s.statBox, isMobile && s.statBoxMobile, { backgroundColor: 'rgba(255,255,255,0.04)' }]}><Text style={[s.statNum, isMobile && s.statNumMobile, { color: C.muted }]}>{other.length}</Text><Text style={s.statLabel}>Other</Text></View>
         </View>
 
         {loading ? (
@@ -300,44 +302,48 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg },
   safe: { flex: 1 },
   scroll: { flex: 1 },
-  content: { padding: 16 },
+  content: { padding: 16, maxWidth: 960, alignSelf: 'center' as const, width: '100%' as any },
 
   title: { fontSize: 28, fontWeight: '900', color: C.text, marginBottom: 4 },
-  subtitle: { fontSize: 14, color: C.muted, marginBottom: 16 },
+  titleMobile: { fontSize: 22 },
+  subtitle: { fontSize: 13, color: C.muted, marginBottom: 14 },
 
-  statsRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  statBox: { flex: 1, borderRadius: 12, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: C.border },
+  statsRow: { flexDirection: 'row' as const, gap: 8, marginBottom: 16 },
+  statsRowMobile: { flexWrap: 'wrap' as const, gap: 6 },
+  statBox: { flex: 1, borderRadius: 12, padding: 10, alignItems: 'center' as const, borderWidth: 1, borderColor: C.border, minWidth: 70 },
+  statBoxMobile: { minWidth: '46%' as any, flexBasis: '46%' as any },
   statNum: { fontSize: 24, fontWeight: '900' },
-  statLabel: { fontSize: 11, color: C.muted, fontWeight: '600', marginTop: 2 },
+  statNumMobile: { fontSize: 20 },
+  statLabel: { fontSize: 10, color: C.muted, fontWeight: '600', marginTop: 2 },
 
-  section: { marginBottom: 20 },
-  sectionTitle: { fontSize: 17, fontWeight: '800', color: C.text, marginBottom: 10 },
+  section: { marginBottom: 18 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: C.text, marginBottom: 8 },
 
-  card: { backgroundColor: C.surface, borderRadius: 14, padding: 16, marginBottom: 10, borderLeftWidth: 4, borderWidth: 1, borderColor: C.border },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  providerName: { fontSize: 16, fontWeight: '700', color: C.text, flex: 1 },
-  meta: { fontSize: 13, color: C.muted, marginTop: 2 },
-  bookingIdText: { fontSize: 11, color: C.muted, marginTop: 4, fontFamily: 'monospace' },
+  card: { backgroundColor: C.surface, borderRadius: 14, padding: 14, marginBottom: 10, borderLeftWidth: 4, borderWidth: 1, borderColor: C.border },
+  cardHeader: { flexDirection: 'row' as const, justifyContent: 'space-between' as const, alignItems: 'flex-start' as const, marginBottom: 6, gap: 8 },
+  providerName: { fontSize: 15, fontWeight: '700', color: C.text, flex: 1 },
+  meta: { fontSize: 12, color: C.muted, marginTop: 2 },
+  bookingIdText: { fontSize: 10, color: C.muted, marginTop: 3, fontFamily: 'monospace' },
 
-  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 14 },
-  badgeText: { fontSize: 11, fontWeight: '700' },
-  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
+  badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 14 },
+  badgeText: { fontSize: 10, fontWeight: '700' },
+  badgeRow: { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: 6, marginTop: 8 },
 
   msgPreview: { backgroundColor: C.purpleBg, padding: 10, borderRadius: 10, marginTop: 8, borderLeftWidth: 3, borderLeftColor: C.purple },
-  msgLabel: { fontSize: 10, fontWeight: '700', color: C.purple, letterSpacing: 1, marginBottom: 3 },
-  msgText: { fontSize: 12, color: C.text, fontStyle: 'italic', lineHeight: 17 },
+  msgLabel: { fontSize: 9, fontWeight: '700', color: C.purple, letterSpacing: 1, marginBottom: 3 },
+  msgText: { fontSize: 11, color: C.text, fontStyle: 'italic' as const, lineHeight: 16 },
 
-  actionRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  actionBtn: { flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center', minHeight: 46, justifyContent: 'center' },
-  actionBtnText: { fontSize: 14, fontWeight: '700' },
+  actionRow: { flexDirection: 'row' as const, gap: 8, marginTop: 10 },
+  actionBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' as const, minHeight: 42, justifyContent: 'center' as const },
+  actionBtnText: { fontSize: 13, fontWeight: '700' },
 
-  emptyBox: { alignItems: 'center', paddingVertical: 60 },
-  emptyIcon: { fontSize: 48 },
-  emptyText: { fontSize: 18, fontWeight: '700', color: C.text, marginTop: 12 },
-  emptySub: { fontSize: 14, color: C.muted, textAlign: 'center', marginTop: 6, paddingHorizontal: 30 },
+  emptyBox: { alignItems: 'center' as const, paddingVertical: 50 },
+  emptyIcon: { fontSize: 44 },
+  emptyText: { fontSize: 17, fontWeight: '700', color: C.text, marginTop: 10 },
+  emptySub: { fontSize: 13, color: C.muted, textAlign: 'center' as const, marginTop: 6, paddingHorizontal: 24 },
 
-  seedBtn: { backgroundColor: C.surface, paddingVertical: 16, borderRadius: 14, alignItems: 'center', marginTop: 16, borderWidth: 1.5, borderColor: C.green },
-  seedBtnText: { color: C.green, fontSize: 15, fontWeight: '700' },
-  homeBtn: { backgroundColor: C.deepGreen, paddingVertical: 16, borderRadius: 14, alignItems: 'center', marginTop: 8 },
-  homeBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
+  seedBtn: { backgroundColor: C.surface, paddingVertical: 14, borderRadius: 14, alignItems: 'center' as const, marginTop: 14, borderWidth: 1.5, borderColor: C.green },
+  seedBtnText: { color: C.green, fontSize: 14, fontWeight: '700' },
+  homeBtn: { backgroundColor: C.deepGreen, paddingVertical: 14, borderRadius: 14, alignItems: 'center' as const, marginTop: 8 },
+  homeBtnText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
 });
