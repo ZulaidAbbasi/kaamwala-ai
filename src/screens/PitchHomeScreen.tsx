@@ -1,7 +1,7 @@
 // src/screens/PitchHomeScreen.tsx
 // Premium startup landing — the first thing judges see
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -66,6 +66,26 @@ export default function PitchHomeScreen({ navigation }: { navigation: any }) {
     ).start();
   }, []);
 
+  // Fetch latest booking for alerts
+  const [booking, setBooking] = useState<any>(null);
+  const [alertCount, setAlertCount] = useState(0);
+
+  useEffect(() => {
+    const fetchBooking = async () => {
+      try {
+        const r = await fetch('https://us-central1-kaamwala-ai.cloudfunctions.net/api/bookings');
+        const data = await r.json();
+        if (data.success && data.bookings?.length > 0) {
+          setBooking(data.bookings[0]);
+          setAlertCount(data.bookings.length);
+        }
+      } catch { /* silent */ }
+    };
+    const unsub = navigation.addListener('focus', fetchBooking);
+    fetchBooking();
+    return unsub;
+  }, [navigation]);
+
   const statusItems = [
     { label: 'Backend Live', color: C.emerald, glow: C.emeraldGlow },
     { label: 'Google Places', color: C.cyan, glow: C.cyanGlow },
@@ -122,6 +142,49 @@ export default function PitchHomeScreen({ navigation }: { navigation: any }) {
                 <Text style={[s.statusLabel, { color: item.color }]}>{item.label}</Text>
               </Animated.View>
             ))}
+          </View>
+
+          {/* ──── Alerts / Notifications ──── */}
+          <View style={s.alertsCard}>
+            <View style={s.alertsHeader}>
+              <View style={s.alertsBellWrap}>
+                <Text style={s.alertsBellIcon}>🔔</Text>
+                {alertCount > 0 && (
+                  <View style={s.alertsBadge}>
+                    <Text style={s.alertsBadgeText}>{alertCount}</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={s.alertsTitle}>Alerts & Follow-Ups</Text>
+            </View>
+            {booking ? (
+              <TouchableOpacity
+                style={s.alertItem}
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('ProviderAdmin')}
+              >
+                <Text style={s.alertItemIcon}>
+                  {booking.status === 'completed' ? '⭐' : booking.status === 'confirmed' ? '🚗' : '⏳'}
+                </Text>
+                <View style={s.alertItemContent}>
+                  <Text style={s.alertItemTitle}>
+                    {booking.status === 'completed' ? 'Job Completed' : booking.status === 'confirmed' ? 'Provider En Route' : 'Awaiting Confirmation'}
+                  </Text>
+                  <Text style={s.alertItemText}>
+                    {booking.serviceType} — {booking.providerName}
+                  </Text>
+                  <Text style={s.alertItemTime}>
+                    {booking.status === 'completed' ? '✅ Completed' : booking.status === 'confirmed' ? '🟢 Accepted' : '🟡 Pending'}
+                    {' · Tap to manage'}
+                  </Text>
+                </View>
+                <Text style={s.alertItemArrow}>→</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={s.alertEmpty}>
+                <Text style={s.alertEmptyText}>✅ No active alerts. Run a service request to start.</Text>
+              </View>
+            )}
           </View>
 
           {/* ──── Primary CTA ──── */}
@@ -276,4 +339,22 @@ const s = StyleSheet.create({
   footerGlow: { position: 'absolute', top: 0, left: -40, right: -40, height: 80, borderRadius: 40 },
   footerText: { fontSize: 15, fontWeight: '800', color: '#10B981', letterSpacing: 0.8 },
   footerSub: { fontSize: 11, color: 'rgba(100,116,139,0.6)', marginTop: 5, textAlign: 'center' },
+
+  // Alerts
+  alertsCard: { backgroundColor: 'rgba(245,158,11,0.04)', borderRadius: 20, padding: 20, marginTop: 24, borderWidth: 1, borderColor: 'rgba(245,158,11,0.12)' },
+  alertsHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
+  alertsBellWrap: { position: 'relative' },
+  alertsBellIcon: { fontSize: 24 },
+  alertsBadge: { position: 'absolute', top: -4, right: -6, backgroundColor: '#F43F5E', borderRadius: 10, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  alertsBadgeText: { fontSize: 10, fontWeight: '800', color: '#FFF' },
+  alertsTitle: { fontSize: 18, fontWeight: '800', color: '#F59E0B', letterSpacing: -0.2 },
+  alertItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 14, padding: 14, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  alertItemIcon: { fontSize: 28 },
+  alertItemContent: { flex: 1 },
+  alertItemTitle: { fontSize: 15, fontWeight: '700', color: '#F1F5F9', marginBottom: 3 },
+  alertItemText: { fontSize: 13, color: 'rgba(148,163,184,0.85)' },
+  alertItemTime: { fontSize: 11, color: 'rgba(100,116,139,0.7)', marginTop: 4, letterSpacing: 0.3 },
+  alertItemArrow: { fontSize: 18, fontWeight: '700', color: '#F59E0B' },
+  alertEmpty: { paddingVertical: 8 },
+  alertEmptyText: { fontSize: 13, color: 'rgba(100,116,139,0.6)' },
 });
