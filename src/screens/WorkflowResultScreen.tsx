@@ -42,6 +42,7 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
   const rec = r.recovery;
   const candidates = r.candidates || [];
   const others = candidates.filter((_: any, i: number) => sel ? candidates.indexOf(sel) !== i : i > 0).slice(0, 3);
+  const result = r; // alias for booking navigation
   const [expandedMain, setExpandedMain] = useState(false);
   const [expandedOther, setExpandedOther] = useState<number | null>(null);
   const [bookingProvider, setBookingProvider] = useState<string | null>(null);
@@ -60,8 +61,6 @@ export default function WorkflowResultScreen({ navigation, route }: { navigation
     // Reset after short delay in case user comes back
     setTimeout(() => setBookingProvider(null), 2000);
   };
-
-  const result = r; // alias for booking navigation
 
   // Determine if provider is registered (bookable) vs Google Places only
   const isRegisteredProvider = sel?.isRegistered || sel?.bookingEligible || bk?.isRealBooking || bk?.providerSource === 'registered' || false;

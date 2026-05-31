@@ -14,7 +14,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.kaamwala.ai"
+      "bundleIdentifier": "com.kaamwala.ai",
+      "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "Allow KaamWala AI to use speech recognition for voice commands.",
+        "NSMicrophoneUsageDescription": "Allow KaamWala AI to use the microphone for voice input."
+      }
     },
     "android": {
       "package": "com.kaamwala.ai",
@@ -23,7 +27,10 @@
         "backgroundColor": "#F9FAFB"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,8 +47,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "06d92a91-b965-475e-b39a-3690b811f703"
+        "projectId": "d3148956-896e-4be1-bcd3-d0fdb2d57d81"
       }
-    }
+    },
+    "owner": "zulaidahmadabbasi"
   }
 }

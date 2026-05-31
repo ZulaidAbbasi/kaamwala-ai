@@ -27,6 +27,18 @@ import RegisteredProvidersScreen from './src/screens/RegisteredProvidersScreen';
 import AntigravityEvidenceScreen from './src/screens/AntigravityEvidenceScreen';
 import ProviderAdminScreen from './src/screens/ProviderAdminScreen';
 
+// Previously missing screens (Bug fix: navigation crashes)
+import HomeScreen from './src/screens/HomeScreen';
+import AIUnderstandingScreen from './src/screens/AIUnderstandingScreen';
+import OutcomeEvaluationScreen from './src/screens/OutcomeEvaluationScreen';
+import FollowUpTimelineScreen from './src/screens/FollowUpTimelineScreen';
+import BookingScreen from './src/screens/BookingScreen';
+import ProviderDiscoveryScreen from './src/screens/ProviderDiscoveryScreen';
+import ProviderRankingScreen from './src/screens/ProviderRankingScreen';
+import DynamicPricingScreen from './src/screens/DynamicPricingScreen';
+import WinningDemoScreen from './src/screens/WinningDemoScreen';
+import ServiceRequestScreen from './src/screens/ServiceRequestScreen';
+
 const Stack = createNativeStackNavigator();
 const T = { bg: '#F9FAFB', header: '#FFFFFF', text: '#141B2B', accent: '#059669' };
 
@@ -77,6 +89,18 @@ function AppInner() {
           <Stack.Screen name="RegisteredProviders" component={RegisteredProvidersScreen} options={{ title: 'Providers' }} />
           <Stack.Screen name="AntigravityEvidence" component={AntigravityEvidenceScreen} options={{ title: 'Evidence' }} />
           <Stack.Screen name="ProviderAdmin" component={ProviderAdminScreen} options={{ title: 'Provider Dashboard' }} />
+
+          {/* Additional screens (Bug fix: previously missing from navigator) */}
+          <Stack.Screen name="OldHome" component={HomeScreen} options={{ title: 'Dashboard' }} />
+          <Stack.Screen name="AIUnderstanding" component={AIUnderstandingScreen} options={{ title: 'AI Understanding' }} />
+          <Stack.Screen name="OutcomeEvaluation" component={OutcomeEvaluationScreen} options={{ title: 'Outcome Evaluation' }} />
+          <Stack.Screen name="FollowUpTimeline" component={FollowUpTimelineScreen} options={{ title: 'Follow-Up Timeline' }} />
+          <Stack.Screen name="Booking" component={BookingScreen} options={{ title: 'Booking' }} />
+          <Stack.Screen name="ProviderDiscovery" component={ProviderDiscoveryScreen} options={{ title: 'Provider Discovery' }} />
+          <Stack.Screen name="ProviderRanking" component={ProviderRankingScreen} options={{ title: 'Provider Ranking' }} />
+          <Stack.Screen name="DynamicPricing" component={DynamicPricingScreen} options={{ title: 'Dynamic Pricing' }} />
+          <Stack.Screen name="WinningDemo" component={WinningDemoScreen} options={{ title: 'Live Demo', headerShown: false }} />
+          <Stack.Screen name="ServiceRequest" component={ServiceRequestScreen} options={{ title: 'Service Request' }} />
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar style="dark" />
