@@ -248,11 +248,26 @@ export async function runServiceWorkflow(
     try {
       const rv = await post(API_ENDPOINTS.RESOLVE_DISPUTE, {
         workflowId: wfId, scenario: 'provider_cancellation',
-        bookingId: result.booking?.bookingId || `demo_${Date.now()}`, rawText, confidence: 0.85,
+        bookingId: result.booking?.bookingId || `demo_${Date.now()}`,
+        serviceType: parsedReq.serviceType,
+        providerCandidates: (result.candidates || []).map((c: any) => ({
+          name: c.name,
+          candidateId: c.candidateId,
+          rating: c.rating,
+          reviewCount: c.reviewCount,
+          distanceEstimateKm: c.distanceEstimateKm,
+          isRegistered: c.isRegistered,
+          bookable: c.bookable,
+          source: c.source,
+          categories: c.categories,
+          address: c.address,
+        })),
+        rawText, confidence: 0.85,
       });
       if (rv.traces) traces.push(...rv.traces);
       result.recovery = rv.recovery || null;
-      onStep('recover', 'done', 'Recovery tested ✓');
+      const backupName = rv.recovery?.stateAfter?.replacementProvider;
+      onStep('recover', 'done', backupName ? `Backup: ${backupName.substring(0, 30)}` : 'Recovery tested ✓');
     } catch {
       onStep('recover', 'warning', 'Recovery simulation partial');
     }

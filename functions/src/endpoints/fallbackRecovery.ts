@@ -84,7 +84,7 @@ async function withTraces(
 
 export async function handleSimulateProviderCancellation(req: Request, res: Response): Promise<void> {
   const startTime = Date.now();
-  const { workflowId, bookingId } = req.body;
+  const { workflowId, bookingId, serviceType, providerCandidates } = req.body;
 
   if (!workflowId || !bookingId) {
     res.status(400).json({ success: false, error: { code: 'MISSING_PARAMS', message: 'workflowId and bookingId required.' } });
@@ -94,7 +94,12 @@ export async function handleSimulateProviderCancellation(req: Request, res: Resp
   try {
     const { result, traces } = await withTraces(
       workflowId, 'Recovery_Agent', 'Provider cancellation',
-      () => handleProviderCancellation({ workflowId, bookingId }),
+      () => handleProviderCancellation({
+        workflowId,
+        bookingId,
+        serviceType: serviceType || undefined,
+        providerCandidates: providerCandidates || [],
+      }),
       startTime,
     );
 
@@ -168,7 +173,7 @@ export async function handleLowConfidenceEndpoint(req: Request, res: Response): 
 
 export async function handleResolveDispute(req: Request, res: Response): Promise<void> {
   const startTime = Date.now();
-  const { workflowId, scenario, bookingId, rawText, confidence, failedApi, customerClaim } = req.body;
+  const { workflowId, scenario, bookingId, rawText, confidence, failedApi, customerClaim, serviceType, providerCandidates } = req.body;
 
   if (!workflowId) {
     res.status(400).json({ success: false, error: { code: 'MISSING_PARAMS', message: 'workflowId required.' } });
@@ -181,11 +186,16 @@ export async function handleResolveDispute(req: Request, res: Response): Promise
   switch (scenario) {
     case 'provider_cancellation':
       label = 'Provider cancellation';
-      runFn = () => handleProviderCancellation({ workflowId, bookingId: bookingId || `book_demo_${Date.now()}` });
+      runFn = () => handleProviderCancellation({
+        workflowId,
+        bookingId: bookingId || `book_demo_${Date.now()}`,
+        serviceType: serviceType || undefined,
+        providerCandidates: providerCandidates || [],
+      });
       break;
     case 'no_provider_found':
       label = 'No provider found';
-      runFn = () => handleNoProviderFound({ workflowId, serviceType: 'AC Repair', locationArea: 'G-13 Islamabad' });
+      runFn = () => handleNoProviderFound({ workflowId, serviceType: serviceType || 'AC Repair', locationArea: 'G-13 Islamabad' });
       break;
     case 'low_confidence':
       label = 'Low confidence request';

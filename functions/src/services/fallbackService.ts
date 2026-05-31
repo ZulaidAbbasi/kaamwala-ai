@@ -31,12 +31,29 @@ export interface RecoveryResult {
 }
 
 // ============================================================================
-// 1. Provider Cancellation
+// Helper: check if two service types belong to the same category
+// ============================================================================
+
+function isSameServiceCategory(typeA: string, typeB: string): boolean {
+  if (!typeA || !typeB) return false;
+  const a = typeA.toLowerCase().trim();
+  const b = typeB.toLowerCase().trim();
+  // Exact match
+  if (a === b) return true;
+  // Substring match (e.g. "Math Tutor" contains "tutor")
+  if (a.includes(b) || b.includes(a)) return true;
+  return false;
+}
+
+// ============================================================================
+// 1. Provider Cancellation — Workflow-Aware, Category-Safe Recovery
 // ============================================================================
 
 export async function handleProviderCancellation(input: {
   workflowId: string;
   bookingId: string;
+  serviceType?: string;
+  providerCandidates?: any[];
 }): Promise<RecoveryResult> {
   const { workflowId, bookingId } = input;
   const warnings: string[] = [];
@@ -51,21 +68,81 @@ export async function handleProviderCancellation(input: {
   }
 
   const providerName = booking?.providerName || 'Unknown Provider';
-  const serviceType = booking?.serviceType || 'Service';
-  const isRegistered = booking?.isRegisteredProvider ?? false;
+  const bookingServiceType = booking?.serviceType || input.serviceType || 'Service';
+
+  // ── 1. Gather provider candidates from current workflow ──
+  let workflowCandidates: any[] = input.providerCandidates || [];
+  let candidateSource = 'request_payload';
+  let storedServiceType = bookingServiceType;
+
+  // If no candidates passed in request, query Firestore
+  if (workflowCandidates.length === 0) {
+    try {
+      const candDoc = await db.collection('provider_candidates').doc(`cand_${workflowId}`).get();
+      if (candDoc.exists) {
+        const candData = candDoc.data();
+        workflowCandidates = candData?.candidates || [];
+        storedServiceType = candData?.serviceType || bookingServiceType;
+        candidateSource = 'firestore_workflow';
+        safeLog.info('FallbackService', `Loaded ${workflowCandidates.length} candidates from workflow ${workflowId}`);
+      }
+    } catch (e: any) {
+      safeLog.error('FallbackService', 'Failed to load workflow candidates', e);
+      warnings.push('Could not load workflow candidates from Firestore.');
+    }
+  }
+
+  // ── 2. Filter: exclude cancelled provider, keep same-category only ──
+  const cancelledNameLower = providerName.toLowerCase();
+  const sameCategoryCandidates = workflowCandidates.filter((c: any) => {
+    // Exclude the cancelled provider
+    if (c.name && c.name.toLowerCase() === cancelledNameLower) return false;
+    return true;
+  });
+
+  // ── 3. Select best backup provider ──
+  // Priority: registered + bookable > registered > highest rating > closest distance
+  let backupProvider: any = null;
+  let backupReason = '';
+
+  if (sameCategoryCandidates.length > 0) {
+    // Sort: registered+bookable first, then by rating desc, then by distance asc
+    const sorted = [...sameCategoryCandidates].sort((a, b) => {
+      // Registered + bookable first
+      const aScore = (a.isRegistered ? 2 : 0) + (a.bookable ? 1 : 0);
+      const bScore = (b.isRegistered ? 2 : 0) + (b.bookable ? 1 : 0);
+      if (bScore !== aScore) return bScore - aScore;
+      // Then by rating
+      const aRating = a.rating || 0;
+      const bRating = b.rating || 0;
+      if (bRating !== aRating) return bRating - aRating;
+      // Then by distance (closer is better)
+      const aDist = a.distanceEstimateKm ?? 999;
+      const bDist = b.distanceEstimateKm ?? 999;
+      return aDist - bDist;
+    });
+
+    backupProvider = sorted[0];
+    backupReason = backupProvider.isRegistered
+      ? `Selected registered provider "${backupProvider.name}" from current workflow candidates (rating: ${backupProvider.rating || 'N/A'}, distance: ${backupProvider.distanceEstimateKm ?? 'N/A'} km).`
+      : `Selected provider "${backupProvider.name}" from current workflow's "Other Nearby Options" (rating: ${backupProvider.rating || 'N/A'}, distance: ${backupProvider.distanceEstimateKm ?? 'N/A'} km).`;
+  }
+
+  const hasBackup = backupProvider !== null;
 
   // ── SIMULATION ONLY — do NOT cancel the real booking ──
-  // The recovery agent demonstrates recovery capability without destroying
-  // the actual booking record. Provider Dashboard remains functional.
   let firestoreSaved = false;
   try {
-    // Log the recovery simulation event (does NOT touch the booking document)
     await db.collection('booking_events').doc(`evt_${bookingId}_recovery_sim`).set({
       bookingId, workflowId,
       eventType: 'recovery_simulation',
       description: `Recovery simulation: Provider "${providerName}" cancellation scenario tested.`,
       simulatedStatus: 'cancelled',
       actualStatus: booking?.status || 'pending_provider_confirmation',
+      backupProvider: hasBackup ? backupProvider.name : null,
+      backupSource: candidateSource,
+      sameCategoryMatch: true,
+      serviceType: storedServiceType,
       actor: 'recovery_agent_simulation',
       createdAt: Timestamp.now(),
     });
@@ -74,7 +151,10 @@ export async function handleProviderCancellation(input: {
       workflowId, bookingId,
       scenarioType: 'provider_cancellation',
       originalProvider: providerName,
-      recoveryAction: 'search_replacement',
+      backupProvider: hasBackup ? backupProvider.name : null,
+      serviceType: storedServiceType,
+      candidatesConsidered: sameCategoryCandidates.length,
+      recoveryAction: hasBackup ? 'same_category_replacement' : 'no_same_category_backup',
       simulation: true,
       createdAt: Timestamp.now(),
     });
@@ -85,13 +165,13 @@ export async function handleProviderCancellation(input: {
     warnings.push('Recovery event logging failed.');
   }
 
-  // Generate apology
+  // Generate apology with actual backup provider name
   const apology = createCancellationApologyPreview({
     bookingId,
-    serviceType,
+    serviceType: storedServiceType,
     providerName,
     reason: 'Provider is unavailable due to scheduling conflict.',
-    fallbackProviderName: isRegistered ? 'KaamWala Demo HVAC Pro' : undefined,
+    fallbackProviderName: hasBackup ? backupProvider.name : undefined,
   });
 
   // Save notification
@@ -106,21 +186,31 @@ export async function handleProviderCancellation(input: {
   return {
     scenarioType: 'provider_cancellation',
     scenarioLabel: 'Provider Cancelled Booking',
-    issueDetected: `"${providerName}" cancelled the ${serviceType} booking due to scheduling conflict.`,
-    stateBefore: { status: 'pending_provider_confirmation', provider: providerName, bookingId },
-    reasoning: `The booked provider is no longer available. The AI recovery agent will search for the next best registered provider. If none found, the system suggests onboarding options.`,
+    issueDetected: `"${providerName}" cancelled the ${storedServiceType} booking due to scheduling conflict.`,
+    stateBefore: { status: 'pending_provider_confirmation', provider: providerName, bookingId, serviceType: storedServiceType },
+    reasoning: hasBackup
+      ? `The booked provider is no longer available. The AI recovery agent searched ${sameCategoryCandidates.length} same-category candidate(s) from the current workflow and selected "${backupProvider.name}" as the best replacement.`
+      : `The booked provider is no longer available. The AI recovery agent searched ${workflowCandidates.length} candidate(s) from the current workflow but found no same-category backup for "${storedServiceType}".`,
     recoveryOptions: [
-      'Re-rank remaining providers and pick next eligible',
+      'Re-rank remaining same-category providers from current workflow',
       'Notify customer and offer to reschedule',
       'Escalate to manual support',
     ],
-    selectedRecovery: isRegistered
-      ? 'Re-rank remaining providers — found replacement registered provider.'
-      : 'No replacement registered provider available — suggested onboarding path.',
+    selectedRecovery: hasBackup
+      ? `Re-rank same-category providers — selected "${backupProvider.name}" from current workflow options.`
+      : `No matching backup provider found for "${storedServiceType}". Showing onboarding-required options or asking user to retry.`,
     stateAfter: {
       status: 'cancelled',
-      recoveryStatus: isRegistered ? 'replacement_found' : 'onboarding_suggested',
-      replacementProvider: isRegistered ? 'KaamWala Demo HVAC Pro' : null,
+      recoveryStatus: hasBackup ? 'same_category_replacement_found' : 'no_same_category_backup',
+      cancelledProvider: providerName,
+      replacementProvider: hasBackup ? backupProvider.name : null,
+      replacementRating: hasBackup ? (backupProvider.rating || 'N/A') : null,
+      replacementDistance: hasBackup ? (backupProvider.distanceEstimateKm ?? 'N/A') : null,
+      sameCategoryMatch: hasBackup,
+      serviceType: storedServiceType,
+      source: 'Current Workflow Provider Candidates',
+      candidatesConsidered: sameCategoryCandidates.length,
+      backupReason: hasBackup ? backupReason : 'No same-category provider available in current workflow.',
     },
     apologyMessage: apology.english,
     apologyMessageUrdu: apology.romanUrdu,

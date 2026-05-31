@@ -150,6 +150,59 @@ export default function FallbackRecoveryScreen({ navigation, route }: { navigati
             ))}
           </SectionCard>
 
+          {/* Category-Safe Recovery Details (for provider_cancellation) */}
+          {r.scenarioType === 'provider_cancellation' && r.stateAfter?.cancelledProvider && (
+            <SectionCard title="🔄 Category-Safe Recovery" accent="success">
+              <View style={s.stateRow}>
+                <Text style={s.stateKey}>Cancelled Provider</Text>
+                <Text style={[s.stateVal, { color: colors.error }]}>{r.stateAfter.cancelledProvider}</Text>
+              </View>
+              <View style={s.stateRow}>
+                <Text style={s.stateKey}>Backup Provider</Text>
+                <Text style={[s.stateVal, { color: r.stateAfter.replacementProvider ? colors.success : colors.warning }]}>
+                  {r.stateAfter.replacementProvider || 'None available'}
+                </Text>
+              </View>
+              <View style={s.stateRow}>
+                <Text style={s.stateKey}>Service Type</Text>
+                <Text style={s.stateVal}>{r.stateAfter.serviceType || 'N/A'}</Text>
+              </View>
+              <View style={s.stateRow}>
+                <Text style={s.stateKey}>Same-Category Match</Text>
+                <Text style={[s.stateVal, { color: r.stateAfter.sameCategoryMatch ? colors.success : colors.error }]}>
+                  {r.stateAfter.sameCategoryMatch ? '✅ Yes' : '❌ No'}
+                </Text>
+              </View>
+              <View style={s.stateRow}>
+                <Text style={s.stateKey}>Source</Text>
+                <Text style={s.stateVal}>{r.stateAfter.source || 'N/A'}</Text>
+              </View>
+              {r.stateAfter.replacementRating && (
+                <View style={s.stateRow}>
+                  <Text style={s.stateKey}>Backup Rating</Text>
+                  <Text style={s.stateVal}>⭐ {r.stateAfter.replacementRating}</Text>
+                </View>
+              )}
+              {r.stateAfter.replacementDistance && (
+                <View style={s.stateRow}>
+                  <Text style={s.stateKey}>Backup Distance</Text>
+                  <Text style={s.stateVal}>{r.stateAfter.replacementDistance} km</Text>
+                </View>
+              )}
+              <View style={s.stateRow}>
+                <Text style={s.stateKey}>Candidates Considered</Text>
+                <Text style={s.stateVal}>{r.stateAfter.candidatesConsidered ?? 0}</Text>
+              </View>
+              {r.stateAfter.backupReason && (
+                <Text style={[s.stateDesc, { marginTop: 8, fontStyle: 'italic' }]}>{r.stateAfter.backupReason}</Text>
+              )}
+              <View style={[s.badgeRow, { marginTop: 8 }]}>
+                <StatusBadge label="Workflow-Specific" variant="success" size="sm" />
+                <StatusBadge label="Category-Safe" variant="ai" size="sm" />
+              </View>
+            </SectionCard>
+          )}
+
           {/* State After */}
           <SectionCard title="✅ State After" accent="success">
             <Text style={s.stateDesc}>{r.reasoning}</Text>
@@ -206,6 +259,7 @@ export default function FallbackRecoveryScreen({ navigation, route }: { navigati
             {r.firestoreSaved && <StatusBadge label="Firestore Saved" variant="success" />}
             <StatusBadge label={`Scenario: ${r.scenarioType}`} variant="info" />
             <StatusBadge label="Safe Simulation" variant="warning" />
+            {r.stateAfter?.sameCategoryMatch && <StatusBadge label="Same-Category ✓" variant="success" />}
           </View>
 
           {/* Warnings */}

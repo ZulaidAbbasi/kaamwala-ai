@@ -210,7 +210,7 @@
                 Trace Logged
             </span>
 </div>
-<!-- Bento Grid: State Before & After -->
+<!-- Bento Grid: State Before & Category-Safe Recovery -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
 <!-- State Before Card (Issue) -->
 <div class="bg-surface rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-error-container p-card-padding flex flex-col gap-3 relative overflow-hidden">
@@ -219,35 +219,64 @@
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">error</span>
 <h3 class="font-headline-md text-headline-md text-on-surface">State Before</h3>
 </div>
-<p class="font-body-md text-body-md text-on-surface-variant">Original provider cancelled appointment 15 mins prior to the scheduled start time.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">"EduPak Home Tutors" cancelled the Math Tutor booking due to scheduling conflict.</p>
+<div class="flex flex-col gap-1.5 mt-1 text-[13px]">
+  <div class="flex justify-between"><span class="text-on-surface-variant">Status</span><span class="text-error font-semibold">pending_provider_confirmation</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Provider</span><span class="text-on-surface font-semibold">EduPak Home Tutors</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Service Type</span><span class="text-on-surface font-semibold">Math Tutor</span></div>
 </div>
-<!-- State After Card (Resolution) -->
+</div>
+<!-- Category-Safe Recovery Card -->
 <div class="bg-surface rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-primary-fixed-dim p-card-padding flex flex-col gap-3 relative overflow-hidden">
 <div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
 <div class="flex items-center gap-2 text-primary-container">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<h3 class="font-headline-md text-headline-md text-on-surface">State After</h3>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">swap_horiz</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Category-Safe Recovery</h3>
 </div>
-<p class="font-body-md text-body-md text-on-surface-variant">Agent autonomously executed fallback matrix, secured a replacement, and mitigated service failure.</p>
+<div class="flex flex-col gap-1.5 mt-1 text-[13px]">
+  <div class="flex justify-between"><span class="text-on-surface-variant">Cancelled Provider</span><span class="text-error font-semibold">EduPak Home Tutors</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Backup Provider</span><span class="text-primary font-bold">Zahid Home Tuition Islamabad</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Service Type</span><span class="text-on-surface font-semibold">Math Tutor</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Same-Category Match</span><span class="text-primary font-bold">✅ Yes</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Source</span><span class="text-on-surface font-semibold">Current Workflow Candidates</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Backup Rating</span><span class="text-on-surface font-semibold">⭐ 4.9 (30)</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Backup Distance</span><span class="text-on-surface font-semibold">4.8 km</span></div>
+  <div class="flex justify-between"><span class="text-on-surface-variant">Candidates Considered</span><span class="text-on-surface font-semibold">3</span></div>
+</div>
+<div class="flex flex-wrap gap-1.5 mt-2">
+  <span class="bg-primary-fixed/30 text-on-primary-fixed-variant px-2 py-0.5 rounded text-[11px] font-semibold">Workflow-Specific</span>
+  <span class="bg-tertiary-fixed/30 text-on-tertiary-fixed-variant px-2 py-0.5 rounded text-[11px] font-semibold">Category-Safe</span>
+  <span class="bg-secondary-fixed/30 text-on-secondary-fixed-variant px-2 py-0.5 rounded text-[11px] font-semibold">Same-Category ✓</span>
 </div>
 </div>
-<!-- Selected Action & Apology Details -->
+</div>
+<!-- Selected Action & Backup Reason -->
 <div class="bg-surface/80 backdrop-blur-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30 p-card-padding flex flex-col gap-4">
 <div>
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Selected Action</p>
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary-container">swap_calls</span>
-<h3 class="font-headline-md text-headline-md text-on-surface">New provider / new slot</h3>
+<h3 class="font-headline-md text-headline-md text-on-surface">Re-rank same-category providers — selected "Zahid Home Tuition Islamabad"</h3>
 </div>
 </div>
 <hr class="border-outline-variant/20"/>
 <div class="bg-surface-variant/30 rounded-lg p-3 border-l-4 border-primary-container flex flex-col gap-2">
 <div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">info</span>
+<span class="font-label-sm text-label-sm">Backup Selection Reason</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic">
+                    Selected provider "Zahid Home Tuition Islamabad" from current workflow's "Other Nearby Options" (rating: 4.9, distance: 4.8 km). Same service category "Math Tutor" — never HVAC, plumber, or unrelated.
+                </p>
+</div>
+<hr class="border-outline-variant/20"/>
+<div class="bg-surface-variant/30 rounded-lg p-3 border-l-4 border-tertiary-container flex flex-col gap-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
 <span class="material-symbols-outlined text-[16px]">chat</span>
 <span class="font-label-sm text-label-sm">Apology Message Preview</span>
 </div>
 <p class="font-body-md text-body-md text-on-surface italic text-on-surface-variant">
-                    "We sincerely apologize for the sudden cancellation. Our AI agent has immediately secured a highly-rated replacement provider for a new slot at 2:30 PM today. Please review the updated details."
+                    "We're sorry — 'EduPak Home Tutors' has cancelled your Math Tutor booking. ✅ Good news! We've found a replacement: 'Zahid Home Tuition Islamabad'."
                 </p>
 </div>
 </div>
@@ -261,12 +290,12 @@
 <span class="font-label-sm text-label-sm bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded">v1.0.4</span>
 </div>
 <div class="font-mono text-[12px] leading-relaxed text-on-surface-variant space-y-1">
-<p><span class="text-error">[14:02:11]</span> Event: <span class="text-on-surface font-semibold">ProviderCancellation</span> detected.</p>
-<p><span class="text-outline">[14:02:12]</span> Action: Halt user notification. Eval fallback matrix.</p>
-<p><span class="text-outline">[14:02:13]</span> Eval: Priority 1 (Same provider/New slot) -&gt; <span class="text-error">FAILED</span>.</p>
-<p><span class="text-outline">[14:02:14]</span> Eval: Priority 2 (New provider/Same slot) -&gt; <span class="text-error">FAILED</span>.</p>
-<p><span class="text-primary-container font-semibold">[14:02:16]</span> Eval: Priority 3 (New provider/New slot) -&gt; <span class="text-primary">MATCH</span> (Provider ID: #882).</p>
-<p><span class="text-outline">[14:02:17]</span> Action: Draft comms and queue user confirmation.</p>
+<p><span class="text-error">[14:02:11]</span> Event: <span class="text-on-surface font-semibold">ProviderCancellation</span> detected — "EduPak Home Tutors".</p>
+<p><span class="text-outline">[14:02:12]</span> Action: Query provider_candidates for workflow. Found <span class="text-on-surface font-semibold">3 same-category candidates</span>.</p>
+<p><span class="text-outline">[14:02:13]</span> Filter: Exclude cancelled provider. Category: <span class="text-on-surface font-semibold">Math Tutor</span>.</p>
+<p><span class="text-outline">[14:02:14]</span> Rank: Sort by registered → rating → distance.</p>
+<p><span class="text-primary-container font-semibold">[14:02:15]</span> Result: Selected <span class="text-primary">"Zahid Home Tuition Islamabad"</span> — ⭐ 4.9, 4.8 km.</p>
+<p><span class="text-outline">[14:02:16]</span> Source: <span class="text-on-surface font-semibold">Current Workflow Provider Candidates</span>. Same-category: <span class="text-primary">YES</span>.</p>
 </div>
 </div>
 </main>

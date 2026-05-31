@@ -346,6 +346,7 @@ export async function handleDiscoverProviders(req: Request, res: Response): Prom
   try {
     await db.collection('provider_candidates').doc(docId).set({
       workflowId,
+      serviceType,
       geocoded,
       query: placesResult.query,
       totalGoogleResults: placesResult.totalFound,
@@ -359,7 +360,10 @@ export async function handleDiscoverProviders(req: Request, res: Response): Prom
         bookable: c.bookable,
         statusLabel: c.statusLabel,
         rating: c.rating,
+        reviewCount: c.reviewCount,
         distanceEstimateKm: c.distanceEstimateKm,
+        categories: c.categories || [],
+        address: c.address,
       })),
       createdAt: Timestamp.now(),
     });
