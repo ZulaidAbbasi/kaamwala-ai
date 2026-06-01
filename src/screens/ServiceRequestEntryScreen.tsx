@@ -45,6 +45,8 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
   const micPulse = useRef(new Animated.Value(1)).current;
   const recognitionRef = useRef<any>(null);
 
+  const [speechLang, setSpeechLang] = useState('ur-PK');
+
   // Native speech recognition events (mobile)
   useSpeechRecognitionEvent('result', (event) => {
     if (event.results?.[0]?.transcript) {
@@ -53,7 +55,21 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
     }
   });
   useSpeechRecognitionEvent('end', () => setIsListening(false));
-  useSpeechRecognitionEvent('error', () => setIsListening(false));
+  useSpeechRecognitionEvent('error', (event) => {
+    setIsListening(false);
+    const code = (event as any).error || (event as any).code || 'unknown';
+    const message = (event as any).message || '';
+    // If Urdu language not available, auto-retry with English
+    if (speechLang === 'ur-PK' && (code === 'language-not-supported' || code === 'no-speech' || code === 7)) {
+      setSpeechLang('en-US');
+      Alert.alert(
+        'Urdu Speech Unavailable',
+        'Your device does not support Urdu speech recognition. Switching to English. Tap Speak again.',
+      );
+    } else {
+      Alert.alert('Speech Error', `Code: ${code}${message ? '\n' + message : ''}\n\nTry again or type your request instead.`);
+    }
+  });
 
   // Mic pulse animation
   useEffect(() => {
@@ -72,11 +88,13 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
   async function handleMicPress() {
     if (isListening) {
       // Stop listening
-      if (Platform.OS === 'web' && recognitionRef.current) {
-        recognitionRef.current.stop();
-      } else {
-        ExpoSpeechRecognitionModule.stop();
-      }
+      try {
+        if (Platform.OS === 'web' && recognitionRef.current) {
+          recognitionRef.current.stop();
+        } else {
+          ExpoSpeechRecognitionModule.stop();
+        }
+      } catch (_e) { /* ignore stop errors */ }
       setIsListening(false);
       return;
     }
@@ -89,7 +107,7 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
         return;
       }
       const recognition = new SpeechRecognition();
-      recognition.lang = 'ur-PK';
+      recognition.lang = speechLang;
       recognition.interimResults = false;
       recognition.continuous = false;
       recognition.maxAlternatives = 1;
@@ -105,17 +123,25 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
       setIsListening(true);
     } else {
       // Native speech recognition (Android/iOS)
-      const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-      if (!granted) {
-        Alert.alert('Permission Required', 'Please allow microphone access to use voice input.');
-        return;
+      try {
+        const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+        if (!granted) {
+          Alert.alert('Permission Required', 'Please allow microphone access to use voice input.');
+          return;
+        }
+        ExpoSpeechRecognitionModule.start({
+          lang: speechLang,
+          interimResults: false,
+          continuous: false,
+        });
+        setIsListening(true);
+      } catch (err: any) {
+        setIsListening(false);
+        Alert.alert(
+          'Speech Recognition Error',
+          `Could not start speech recognition.\n\n${err?.message || 'Unknown error'}\n\nMake sure you have Google Speech Services installed on your device.`,
+        );
       }
-      ExpoSpeechRecognitionModule.start({
-        lang: 'ur-PK',
-        interimResults: false,
-        continuous: false,
-      });
-      setIsListening(true);
     }
   }
 
@@ -205,7 +231,7 @@ export default function ServiceRequestEntryScreen({ navigation }: { navigation: 
                     {isListening ? '🔴' : '🎤'}
                   </Animated.Text>
                   <Text style={[s.micLabel, isListening && s.micLabelActive]}>
-                    {isListening ? 'Listening...' : 'Speak'}
+                    {isListening ? 'Listening...' : speechLang === 'en-US' ? 'Speak (EN)' : 'Speak'}
                   </Text>
                 </TouchableOpacity>
                 <View style={s.charBadge}>
